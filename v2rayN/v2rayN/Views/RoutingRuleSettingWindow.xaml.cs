@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Microsoft.Win32;
+using ReactiveUI;
 using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Input;
@@ -12,6 +13,17 @@ namespace v2rayN.Views
         public RoutingRuleSettingWindow(RoutingItem routingItem)
         {
             InitializeComponent();
+
+            // 设置窗口的尺寸不大于屏幕的尺寸
+            if (this.Width > SystemParameters.WorkArea.Width)
+            {
+                this.Width = SystemParameters.WorkArea.Width;
+            }
+            if (this.Height > SystemParameters.WorkArea.Height)
+            {
+                this.Height = SystemParameters.WorkArea.Height;
+            }
+
             this.Owner = Application.Current.MainWindow;
             this.Loaded += Window_Loaded;
             this.PreviewKeyDown += RoutingRuleSettingWindow_PreviewKeyDown;
@@ -24,6 +36,10 @@ namespace v2rayN.Views
                 cmbdomainStrategy.Items.Add(it);
             });
             cmbdomainStrategy.Items.Add(string.Empty);
+            Global.domainStrategys4Singbox.ForEach(it =>
+            {
+                cmbdomainStrategy4Singbox.Items.Add(it);
+            });
 
             this.WhenActivated(disposables =>
             {
@@ -32,6 +48,8 @@ namespace v2rayN.Views
 
                 this.Bind(ViewModel, vm => vm.SelectedRouting.remarks, v => v.txtRemarks.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.SelectedRouting.domainStrategy, v => v.cmbdomainStrategy.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedRouting.domainStrategy4Singbox, v => v.cmbdomainStrategy4Singbox.Text).DisposeWith(disposables);
+
                 this.Bind(ViewModel, vm => vm.SelectedRouting.url, v => v.txtUrl.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.SelectedRouting.customIcon, v => v.txtCustomIcon.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.SelectedRouting.sort, v => v.txtSort.Text).DisposeWith(disposables);
@@ -50,9 +68,9 @@ namespace v2rayN.Views
                 this.BindCommand(ViewModel, vm => vm.MoveBottomCmd, v => v.menuMoveBottom).DisposeWith(disposables);
 
                 this.BindCommand(ViewModel, vm => vm.SaveCmd, v => v.btnSave).DisposeWith(disposables);
-
             });
         }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             txtRemarks.Focus();
@@ -89,6 +107,10 @@ namespace v2rayN.Views
                 {
                     ViewModel?.MoveRule(EMove.Bottom);
                 }
+                else if (e.Key == Key.Delete)
+                {
+                    ViewModel?.RuleRemove();
+                }
             }
         }
 
@@ -101,6 +123,7 @@ namespace v2rayN.Views
         {
             ViewModel?.RuleEdit(false);
         }
+
         private void menuRuleSelectAll_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             lstRules.SelectAll();
@@ -108,7 +131,7 @@ namespace v2rayN.Views
 
         private void btnBrowse_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            var openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "PNG|*.png";
             openFileDialog1.ShowDialog();
 

@@ -12,6 +12,17 @@ namespace v2rayN.Views
         public RoutingRuleDetailsWindow(RulesItem rulesItem)
         {
             InitializeComponent();
+
+            // 设置窗口的尺寸不大于屏幕的尺寸
+            if (this.Width > SystemParameters.WorkArea.Width)
+            {
+                this.Width = SystemParameters.WorkArea.Width;
+            }
+            if (this.Height > SystemParameters.WorkArea.Height)
+            {
+                this.Height = SystemParameters.WorkArea.Height;
+            }
+
             this.Owner = Application.Current.MainWindow;
             this.Loaded += Window_Loaded;
             clbProtocol.SelectionChanged += ClbProtocol_SelectionChanged;
@@ -49,10 +60,10 @@ namespace v2rayN.Views
                 this.Bind(ViewModel, vm => vm.SelectedSource.enabled, v => v.togEnabled.IsChecked).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.Domain, v => v.txtDomain.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.IP, v => v.txtIP.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.Process, v => v.txtProcess.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.AutoSort, v => v.chkAutoSort.IsChecked).DisposeWith(disposables);
 
                 this.BindCommand(ViewModel, vm => vm.SaveCmd, v => v.btnSave).DisposeWith(disposables);
-
             });
         }
 
@@ -60,10 +71,12 @@ namespace v2rayN.Views
         {
             cmbOutboundTag.Focus();
         }
+
         private void ClbProtocol_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ViewModel.ProtocolItems = clbProtocol.SelectedItems.Cast<string>().ToList();
         }
+
         private void ClbInboundTag_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ViewModel.InboundTagItems = clbInboundTag.SelectedItems.Cast<string>().ToList();

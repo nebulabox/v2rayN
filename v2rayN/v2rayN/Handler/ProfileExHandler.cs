@@ -5,7 +5,7 @@ using v2rayN.Mode;
 
 namespace v2rayN.Handler
 {
-    class ProfileExHandler
+    internal class ProfileExHandler
     {
         private static readonly Lazy<ProfileExHandler> _instance = new(() => new());
         private ConcurrentBag<ProfileExItem> _lstProfileEx;
@@ -24,7 +24,7 @@ namespace v2rayN.Handler
 
             _lstProfileEx = new(SqliteHelper.Instance.Table<ProfileExItem>());
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 while (true)
                 {
@@ -38,7 +38,7 @@ namespace v2rayN.Handler
                             SqliteHelper.Instance.Replace(item);
                         }
                     }
-                    Thread.Sleep(1000 * 60);
+                    await Task.Delay(1000 * 60);
                 }
             });
         }
@@ -132,6 +132,7 @@ namespace v2rayN.Handler
             }
             return profileEx.sort;
         }
+
         public int GetMaxSort()
         {
             if (_lstProfileEx.Count <= 0)

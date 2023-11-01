@@ -18,6 +18,14 @@ namespace v2rayN.Tool
             LogManager.Configuration = config;
         }
 
+        public static void LoggingEnabled(bool enable)
+        {
+            if (!enable)
+            {
+                LogManager.SuspendLogging();
+            }
+        }
+
         public static void ClearLogs()
         {
             Task.Run(() =>

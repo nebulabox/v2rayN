@@ -12,10 +12,20 @@ namespace v2rayN.Views
 {
     public partial class AddServerWindow
     {
-
         public AddServerWindow(ProfileItem profileItem)
         {
             InitializeComponent();
+
+            // 设置窗口的尺寸不大于屏幕的尺寸
+            if (this.Width > SystemParameters.WorkArea.Width)
+            {
+                this.Width = SystemParameters.WorkArea.Width;
+            }
+            if (this.Height > SystemParameters.WorkArea.Height)
+            {
+                this.Height = SystemParameters.WorkArea.Height;
+            }
+
             this.Owner = Application.Current.MainWindow;
             this.Loaded += Window_Loaded;
             cmbNetwork.SelectionChanged += CmbNetwork_SelectionChanged;
@@ -23,10 +33,20 @@ namespace v2rayN.Views
 
             ViewModel = new AddServerViewModel(profileItem, this);
 
-            Global.coreTypes.ForEach(it =>
+            if (profileItem.configType == EConfigType.VLESS)
             {
-                cmbCoreType.Items.Add(it);
-            });
+                Global.coreTypes4VLESS.ForEach(it =>
+                {
+                    cmbCoreType.Items.Add(it);
+                });
+            }
+            else
+            {
+                Global.coreTypes.ForEach(it =>
+                {
+                    cmbCoreType.Items.Add(it);
+                });
+            }
             cmbCoreType.Items.Add(string.Empty);
 
             cmbStreamSecurity.Items.Add(string.Empty);
@@ -39,6 +59,7 @@ namespace v2rayN.Views
             Global.fingerprints.ForEach(it =>
             {
                 cmbFingerprint.Items.Add(it);
+                cmbFingerprint2.Items.Add(it);
             });
             Global.allowInsecures.ForEach(it =>
             {
@@ -62,6 +83,7 @@ namespace v2rayN.Views
                         profileItem.security = Global.DefaultSecurity;
                     }
                     break;
+
                 case EConfigType.Shadowsocks:
                     gridSs.Visibility = Visibility.Visible;
                     LazyConfig.Instance.GetShadowsocksSecuritys(profileItem).ForEach(it =>
@@ -69,13 +91,15 @@ namespace v2rayN.Views
                         cmbSecurity3.Items.Add(it);
                     });
                     break;
+
                 case EConfigType.Socks:
                     gridSocks.Visibility = Visibility.Visible;
                     break;
+
                 case EConfigType.VLESS:
                     gridVLESS.Visibility = Visibility.Visible;
-                    cmbStreamSecurity.Items.Add(Global.StreamSecurityX);
-                    Global.xtlsFlows.ForEach(it =>
+                    cmbStreamSecurity.Items.Add(Global.StreamSecurityReality);
+                    Global.flows.ForEach(it =>
                     {
                         cmbFlow5.Items.Add(it);
                     });
@@ -84,10 +108,11 @@ namespace v2rayN.Views
                         profileItem.security = Global.None;
                     }
                     break;
+
                 case EConfigType.Trojan:
                     gridTrojan.Visibility = Visibility.Visible;
-                    cmbStreamSecurity.Items.Add(Global.StreamSecurityX);
-                    Global.xtlsFlows.ForEach(it =>
+                    cmbStreamSecurity.Items.Add(Global.StreamSecurityReality);
+                    Global.flows.ForEach(it =>
                     {
                         cmbFlow6.Items.Add(it);
                     });
@@ -110,19 +135,23 @@ namespace v2rayN.Views
                         this.Bind(ViewModel, vm => vm.SelectedSource.alterId, v => v.txtAlterId.Text).DisposeWith(disposables);
                         this.Bind(ViewModel, vm => vm.SelectedSource.security, v => v.cmbSecurity.Text).DisposeWith(disposables);
                         break;
+
                     case EConfigType.Shadowsocks:
                         this.Bind(ViewModel, vm => vm.SelectedSource.id, v => v.txtId3.Text).DisposeWith(disposables);
                         this.Bind(ViewModel, vm => vm.SelectedSource.security, v => v.cmbSecurity3.Text).DisposeWith(disposables);
                         break;
+
                     case EConfigType.Socks:
                         this.Bind(ViewModel, vm => vm.SelectedSource.id, v => v.txtId4.Text).DisposeWith(disposables);
                         this.Bind(ViewModel, vm => vm.SelectedSource.security, v => v.txtSecurity4.Text).DisposeWith(disposables);
                         break;
+
                     case EConfigType.VLESS:
                         this.Bind(ViewModel, vm => vm.SelectedSource.id, v => v.txtId5.Text).DisposeWith(disposables);
                         this.Bind(ViewModel, vm => vm.SelectedSource.flow, v => v.cmbFlow5.Text).DisposeWith(disposables);
                         this.Bind(ViewModel, vm => vm.SelectedSource.security, v => v.txtSecurity5.Text).DisposeWith(disposables);
                         break;
+
                     case EConfigType.Trojan:
                         this.Bind(ViewModel, vm => vm.SelectedSource.id, v => v.txtId6.Text).DisposeWith(disposables);
                         this.Bind(ViewModel, vm => vm.SelectedSource.flow, v => v.cmbFlow6.Text).DisposeWith(disposables);
@@ -138,9 +167,14 @@ namespace v2rayN.Views
                 this.Bind(ViewModel, vm => vm.SelectedSource.allowInsecure, v => v.cmbAllowInsecure.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.SelectedSource.fingerprint, v => v.cmbFingerprint.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.SelectedSource.alpn, v => v.cmbAlpn.Text).DisposeWith(disposables);
+                //reality
+                this.Bind(ViewModel, vm => vm.SelectedSource.sni, v => v.txtSNI2.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.fingerprint, v => v.cmbFingerprint2.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.publicKey, v => v.txtPublicKey.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.shortId, v => v.txtShortId.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.spiderX, v => v.txtSpiderX.Text).DisposeWith(disposables);
 
                 this.BindCommand(ViewModel, vm => vm.SaveCmd, v => v.btnSave).DisposeWith(disposables);
-
             });
 
             this.Title = $"{profileItem.configType}";
@@ -156,18 +190,27 @@ namespace v2rayN.Views
             SetHeaderType();
             SetTips();
         }
+
         private void CmbStreamSecurity_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var security = cmbStreamSecurity.SelectedItem.ToString();
-            if (Utils.IsNullOrEmpty(security))
+            if (security == Global.StreamSecurityReality)
             {
+                gridRealityMore.Visibility = Visibility.Visible;
                 gridTlsMore.Visibility = Visibility.Hidden;
+            }
+            else if (security == Global.StreamSecurity)
+            {
+                gridRealityMore.Visibility = Visibility.Hidden;
+                gridTlsMore.Visibility = Visibility.Visible;
             }
             else
             {
-                gridTlsMore.Visibility = Visibility.Visible;
+                gridRealityMore.Visibility = Visibility.Hidden;
+                gridTlsMore.Visibility = Visibility.Hidden;
             }
         }
+
         private void btnGUID_Click(object sender, RoutedEventArgs e)
         {
             txtId.Text =
@@ -228,23 +271,28 @@ namespace v2rayN.Views
                     tipRequestHost.Text = ResUI.TransportRequestHostTip1;
                     tipHeaderType.Text = ResUI.TransportHeaderTypeTip1;
                     break;
+
                 case "kcp":
                     tipHeaderType.Text = ResUI.TransportHeaderTypeTip2;
                     tipPath.Text = ResUI.TransportPathTip5;
                     break;
+
                 case "ws":
                     tipRequestHost.Text = ResUI.TransportRequestHostTip2;
                     tipPath.Text = ResUI.TransportPathTip1;
                     break;
+
                 case "h2":
                     tipRequestHost.Text = ResUI.TransportRequestHostTip3;
                     tipPath.Text = ResUI.TransportPathTip2;
                     break;
+
                 case "quic":
                     tipRequestHost.Text = ResUI.TransportRequestHostTip4;
                     tipPath.Text = ResUI.TransportPathTip3;
                     tipHeaderType.Text = ResUI.TransportHeaderTypeTip3;
                     break;
+
                 case "grpc":
                     tipPath.Text = ResUI.TransportPathTip4;
                     tipHeaderType.Text = ResUI.TransportHeaderTypeTip4;
@@ -257,6 +305,5 @@ namespace v2rayN.Views
         {
             this.Close();
         }
-
     }
 }

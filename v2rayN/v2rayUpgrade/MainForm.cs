@@ -92,9 +92,9 @@ namespace v2rayUpgrade
                             File.Move(Application.ExecutablePath, thisAppOldFile);
                         }
 
-                        string entryOuputPath = GetPath(fullName);
-                        Directory.CreateDirectory(Path.GetDirectoryName(entryOuputPath)!);
-                        entry.ExtractToFile(entryOuputPath, true);
+                        string entryOutputPath = GetPath(fullName);
+                        Directory.CreateDirectory(Path.GetDirectoryName(entryOutputPath)!);
+                        entry.ExtractToFile(entryOutputPath, true);
                     }
                     catch (Exception ex)
                     {
@@ -134,6 +134,7 @@ namespace v2rayUpgrade
         {
             return Application.StartupPath;
         }
+
         public static string GetPath(string fileName)
         {
             string startupPath = StartupPath();

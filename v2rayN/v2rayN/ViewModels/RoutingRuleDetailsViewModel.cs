@@ -29,11 +29,12 @@ namespace v2rayN.ViewModels
         public string IP { get; set; }
 
         [Reactive]
+        public string Process { get; set; }
+
+        [Reactive]
         public bool AutoSort { get; set; }
 
-
         public ReactiveCommand<Unit, Unit> SaveCmd { get; }
-
 
         public RoutingRuleDetailsViewModel(RulesItem rulesItem, Window view)
         {
@@ -55,6 +56,7 @@ namespace v2rayN.ViewModels
 
             Domain = Utils.List2String(SelectedSource.domain, true);
             IP = Utils.List2String(SelectedSource.ip, true);
+            Process = Utils.List2String(SelectedSource.process, true);
 
             SaveCmd = ReactiveCommand.Create(() =>
             {
@@ -63,33 +65,37 @@ namespace v2rayN.ViewModels
 
             Utils.SetDarkBorder(view, _config.uiItem.colorModeDark);
         }
+
         private void SaveRules()
         {
+            Domain = Utils.Convert2Comma(Domain);
+            IP = Utils.Convert2Comma(IP);
+            Process = Utils.Convert2Comma(Process);
+
             if (AutoSort)
             {
                 SelectedSource.domain = Utils.String2ListSorted(Domain);
                 SelectedSource.ip = Utils.String2ListSorted(IP);
+                SelectedSource.process = Utils.String2ListSorted(Process);
             }
             else
             {
                 SelectedSource.domain = Utils.String2List(Domain);
                 SelectedSource.ip = Utils.String2List(IP);
+                SelectedSource.process = Utils.String2List(Process);
             }
             SelectedSource.protocol = ProtocolItems?.ToList();
             SelectedSource.inboundTag = InboundTagItems?.ToList();
 
-            bool hasRule =
-              SelectedSource.domain != null
-              && SelectedSource.domain.Count > 0
-              || SelectedSource.ip != null
-              && SelectedSource.ip.Count > 0
-              || SelectedSource.protocol != null
-              && SelectedSource.protocol.Count > 0
+            bool hasRule = SelectedSource.domain?.Count > 0
+              || SelectedSource.ip?.Count > 0
+              || SelectedSource.protocol?.Count > 0
+              || SelectedSource.process?.Count > 0
               || !Utils.IsNullOrEmpty(SelectedSource.port);
 
             if (!hasRule)
             {
-                UI.ShowWarning(string.Format(ResUI.RoutingRuleDetailRequiredTips, "Port/Protocol/Domain/IP"));
+                UI.ShowWarning(string.Format(ResUI.RoutingRuleDetailRequiredTips, "Port/Protocol/Domain/IP/Process"));
                 return;
             }
             //_noticeHandler?.Enqueue(ResUI.OperationSuccess);

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace v2rayN.Base
 {
-    static class StringEx
+    internal static class StringEx
     {
         public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
         {
@@ -32,7 +32,6 @@ namespace v2rayN.Base
             return true;
         }
 
-
         public static IEnumerable<string> NonWhiteSpaceLines(this TextReader reader)
         {
             string? line;
@@ -46,6 +45,40 @@ namespace v2rayN.Base
         public static string TrimEx(this string? value)
         {
             return value == null ? string.Empty : value.Trim();
+        }
+
+        public static string RemovePrefix(this string value, char prefix)
+        {
+            if (value.StartsWith(prefix))
+            {
+                return value.Substring(1);
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        public static string RemovePrefix(this string value, string prefix)
+        {
+            if (value.StartsWith(prefix))
+            {
+                return value.Substring(prefix.Length);
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        public static string UpperFirstChar(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            return char.ToUpper(value[0]) + value.Substring(1);
         }
     }
 }

@@ -9,37 +9,32 @@ namespace v2rayN.Handler
     /// <summary>
     /// Core process processing class
     /// </summary>
-    class CoreHandler
+    internal class CoreHandler
     {
-        private static string _coreCConfigRes = Global.coreConfigFileName;
-        private CoreInfo? _coreInfo;
-        private int _processId = 0;
+        private Config _config;
         private Process? _process;
-        Action<bool, string> _updateFunc;
+        private Process? _processPre;
+        private Action<bool, string> _updateFunc;
 
-        public CoreHandler(Action<bool, string> update)
+        public CoreHandler(Config config, Action<bool, string> update)
         {
+            _config = config;
             _updateFunc = update;
 
             Environment.SetEnvironmentVariable("v2ray.location.asset", Utils.GetBinPath(""), EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("xray.location.asset", Utils.GetBinPath(""), EnvironmentVariableTarget.Process);
         }
 
-        public void LoadCore(Config config)
+        public void LoadCore()
         {
-            var node = ConfigHandler.GetDefaultServer(ref config);
+            var node = ConfigHandler.GetDefaultServer(ref _config);
             if (node == null)
             {
                 ShowMsg(false, ResUI.CheckServerSettings);
                 return;
             }
 
-            if (SetCore(config, node) != 0)
-            {
-                ShowMsg(false, ResUI.CheckServerSettings);
-                return;
-            }
-            string fileName = Utils.GetConfigPath(_coreCConfigRes);
+            string fileName = Utils.GetConfigPath(Global.coreConfigFileName);
             if (CoreConfigHandler.GenerateClientConfig(node, fileName, out string msg, out string content) != 0)
             {
                 ShowMsg(false, msg);
@@ -51,27 +46,12 @@ namespace v2rayN.Handler
                 CoreStop();
                 CoreStart(node);
             }
-
-            //start a socks service
-            if (_process != null && !_process.HasExited && node.configType == EConfigType.Custom && node.preSocksPort > 0)
-            {
-                var itemSocks = new ProfileItem()
-                {
-                    configType = EConfigType.Socks,
-                    address = Global.Loopback,
-                    port = node.preSocksPort
-                };
-                if (CoreConfigHandler.GenerateClientConfig(itemSocks, null, out string msg2, out string configStr) == 0)
-                {
-                    _processId = CoreStartViaString(configStr);
-                }
-            }
         }
 
-        public int LoadCoreConfigString(Config config, List<ServerTestItem> _selecteds)
+        public int LoadCoreConfigString(List<ServerTestItem> _selecteds)
         {
             int pid = -1;
-            string configStr = CoreConfigHandler.GenerateClientSpeedtestConfigString(config, _selecteds, out string msg);
+            string configStr = CoreConfigHandler.GenerateClientSpeedtestConfigString(_config, _selecteds, out string msg);
             if (configStr == "")
             {
                 ShowMsg(false, msg);
@@ -88,38 +68,46 @@ namespace v2rayN.Handler
         {
             try
             {
+                bool hasProc = false;
                 if (_process != null)
                 {
                     KillProcess(_process);
                     _process.Dispose();
                     _process = null;
+                    hasProc = true;
                 }
-                else
+
+                if (_processPre != null)
                 {
-                    if (_coreInfo == null || _coreInfo.coreExes == null)
+                    KillProcess(_processPre);
+                    _processPre.Dispose();
+                    _processPre = null;
+                    hasProc = true;
+                }
+
+                if (!hasProc)
+                {
+                    var coreInfos = LazyConfig.Instance.GetCoreInfos();
+                    foreach (var it in coreInfos)
                     {
-                        return;
-                    }
-                    foreach (string vName in _coreInfo.coreExes)
-                    {
-                        Process[] existing = Process.GetProcessesByName(vName);
-                        foreach (Process p in existing)
+                        if (it.coreType == ECoreType.v2rayN)
                         {
-                            string? path = p.MainModule?.FileName;
-                            if (path == $"{Utils.GetBinPath(vName, _coreInfo.coreType)}.exe")
+                            continue;
+                        }
+                        foreach (string vName in it.coreExes)
+                        {
+                            Process[] existing = Process.GetProcessesByName(vName);
+                            foreach (Process p in existing)
                             {
-                                KillProcess(p);
+                                string? path = p.MainModule?.FileName;
+                                if (path == $"{Utils.GetBinPath(vName, it.coreType)}.exe")
+                                {
+                                    KillProcess(p);
+                                }
                             }
                         }
                     }
                 }
-
-                if (_processId > 0)
-                {
-                    CoreStopPid(_processId);
-                    _processId = 0;
-                }
-
             }
             catch (Exception ex)
             {
@@ -156,6 +144,7 @@ namespace v2rayN.Handler
             if (Utils.IsNullOrEmpty(fileName))
             {
                 string msg = string.Format(ResUI.NotFoundCore, Utils.GetBinPath("", coreInfo.coreType), string.Join(", ", coreInfo.coreExes.ToArray()), coreInfo.coreUrl);
+                Utils.SaveLog(msg);
                 ShowMsg(false, msg);
             }
             return fileName;
@@ -163,65 +152,56 @@ namespace v2rayN.Handler
 
         private void CoreStart(ProfileItem node)
         {
-            ShowMsg(false, string.Format(ResUI.StartService, DateTime.Now.ToString()));
+            ShowMsg(false, string.Format(ResUI.StartService, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")));
 
-            try
+            ECoreType coreType;
+            if (node.configType != EConfigType.Custom && _config.tunModeItem.enableTun)
             {
-                string fileName = CoreFindexe(_coreInfo);
-                if (fileName == "") return;
-
-                var displayLog = node.configType != EConfigType.Custom || node.displayLog;
-                Process p = new()
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = fileName,
-                        Arguments = _coreInfo.arguments,
-                        WorkingDirectory = Utils.GetConfigPath(),
-                        UseShellExecute = false,
-                        RedirectStandardOutput = displayLog,
-                        RedirectStandardError = displayLog,
-                        CreateNoWindow = true,
-                        StandardOutputEncoding = displayLog ? Encoding.UTF8 : null,
-                        StandardErrorEncoding = displayLog ? Encoding.UTF8 : null,
-                    }
-                };
-                if (displayLog)
-                {
-                    p.OutputDataReceived += (sender, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            string msg = e.Data + Environment.NewLine;
-                            ShowMsg(false, msg);
-                        }
-                    };
-                }
-                p.Start();
-                if (displayLog)
-                {
-                    p.BeginOutputReadLine();
-                }
-                _process = p;
-
-                if (p.WaitForExit(1000))
-                {
-                    throw new Exception(displayLog ? p.StandardError.ReadToEnd() : "启动进程失败并退出 (Failed to start the process and exited)");
-                }
-
-                Global.processJob.AddProcess(p.Handle);
+                coreType = ECoreType.sing_box;
             }
-            catch (Exception ex)
+            else
             {
-                Utils.SaveLog(ex.Message, ex);
-                string msg = ex.Message;
-                ShowMsg(true, msg);
+                coreType = LazyConfig.Instance.GetCoreType(node, node.configType);
+            }
+            var coreInfo = LazyConfig.Instance.GetCoreInfo(coreType);
+
+            var displayLog = node.configType != EConfigType.Custom || node.displayLog;
+            var proc = RunProcess(node, coreInfo, "", displayLog, ShowMsg);
+            if (proc is null)
+            {
+                return;
+            }
+            _process = proc;
+
+            //start a socks service
+            if (_process != null && !_process.HasExited)
+            {
+                if ((node.configType == EConfigType.Custom && node.preSocksPort > 0))
+                {
+                    var itemSocks = new ProfileItem()
+                    {
+                        coreType = ECoreType.sing_box,
+                        configType = EConfigType.Socks,
+                        address = Global.Loopback,
+                        port = node.preSocksPort
+                    };
+                    string fileName2 = Utils.GetConfigPath(Global.corePreConfigFileName);
+                    if (CoreConfigHandler.GenerateClientConfig(itemSocks, fileName2, out string msg2, out string configStr) == 0)
+                    {
+                        var coreInfo2 = LazyConfig.Instance.GetCoreInfo(ECoreType.sing_box);
+                        var proc2 = RunProcess(node, coreInfo2, $" -c {Global.corePreConfigFileName}", true, ShowMsg);
+                        if (proc2 is not null)
+                        {
+                            _processPre = proc2;
+                        }
+                    }
+                }
             }
         }
 
         private int CoreStartViaString(string configStr)
         {
-            ShowMsg(false, string.Format(ResUI.StartService, DateTime.Now.ToString()));
+            ShowMsg(false, string.Format(ResUI.StartService, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")));
 
             try
             {
@@ -253,8 +233,17 @@ namespace v2rayN.Handler
                         ShowMsg(false, msg);
                     }
                 };
+                p.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        string msg = e.Data + Environment.NewLine;
+                        ShowMsg(false, msg);
+                    }
+                };
                 p.Start();
                 p.BeginOutputReadLine();
+                p.BeginErrorReadLine();
 
                 p.StandardInput.Write(configStr);
                 p.StandardInput.Close();
@@ -281,6 +270,75 @@ namespace v2rayN.Handler
             _updateFunc(updateToTrayTooltip, msg);
         }
 
+        #region Process
+
+        private Process? RunProcess(ProfileItem node, CoreInfo coreInfo, string configPath, bool displayLog, Action<bool, string> update)
+        {
+            try
+            {
+                string fileName = CoreFindexe(coreInfo);
+                if (Utils.IsNullOrEmpty(fileName))
+                {
+                    return null;
+                }
+                Process proc = new()
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = fileName,
+                        Arguments = string.Format(coreInfo.arguments, configPath),
+                        WorkingDirectory = Utils.GetConfigPath(),
+                        UseShellExecute = false,
+                        RedirectStandardOutput = displayLog,
+                        RedirectStandardError = displayLog,
+                        CreateNoWindow = true,
+                        StandardOutputEncoding = displayLog ? Encoding.UTF8 : null,
+                        StandardErrorEncoding = displayLog ? Encoding.UTF8 : null,
+                    }
+                };
+                if (displayLog)
+                {
+                    proc.OutputDataReceived += (sender, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data))
+                        {
+                            string msg = e.Data + Environment.NewLine;
+                            update(false, msg);
+                        }
+                    };
+                    proc.ErrorDataReceived += (sender, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data))
+                        {
+                            string msg = e.Data + Environment.NewLine;
+                            update(false, msg);
+                        }
+                    };
+                }
+                proc.Start();
+                if (displayLog)
+                {
+                    proc.BeginOutputReadLine();
+                    proc.BeginErrorReadLine();
+                }
+
+                if (proc.WaitForExit(1000))
+                {
+                    throw new Exception(displayLog ? proc.StandardError.ReadToEnd() : "启动进程失败并退出 (Failed to start the process and exited)");
+                }
+
+                Global.processJob.AddProcess(proc.Handle);
+                return proc;
+            }
+            catch (Exception ex)
+            {
+                Utils.SaveLog(ex.Message, ex);
+                string msg = ex.Message;
+                update(true, msg);
+                return null;
+            }
+        }
+
         private void KillProcess(Process p)
         {
             try
@@ -299,21 +357,6 @@ namespace v2rayN.Handler
             }
         }
 
-        private int SetCore(Config config, ProfileItem node)
-        {
-            if (node == null)
-            {
-                return -1;
-            }
-            var coreType = LazyConfig.Instance.GetCoreType(node, node.configType);
-
-            _coreInfo = LazyConfig.Instance.GetCoreInfo(coreType);
-
-            if (_coreInfo == null)
-            {
-                return -1;
-            }
-            return 0;
-        }
+        #endregion Process
     }
 }

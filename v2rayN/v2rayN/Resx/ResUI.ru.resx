@@ -195,9 +195,6 @@
   <data name="LvAddress" xml:space="preserve">
     <value>Адрес</value>
   </data>
-  <data name="LvAlias" xml:space="preserve">
-    <value>Псевдоним</value>
-  </data>
   <data name="LvEncryptionMethod" xml:space="preserve">
     <value>Безопасность</value>
   </data>
@@ -209,9 +206,6 @@
   </data>
   <data name="LvSubscription" xml:space="preserve">
     <value>Группа подписки</value>
-  </data>
-  <data name="LvTestResults" xml:space="preserve">
-    <value>Результаты тестирования</value>
   </data>
   <data name="LvTodayDownloadDataAmount" xml:space="preserve">
     <value>Загружено трафика сегодня</value>
@@ -228,9 +222,6 @@
   <data name="LvTransportProtocol" xml:space="preserve">
     <value>Протокол</value>
   </data>
-  <data name="MediumFresh" xml:space="preserve">
-    <value>Medium</value>
-  </data>
   <data name="MsgClearSubscription" xml:space="preserve">
     <value>Очистить контент оригинальной подписки</value>
   </data>
@@ -246,26 +237,14 @@
   <data name="MsgNoValidSubscription" xml:space="preserve">
     <value>Нет установлены подписки</value>
   </data>
-  <data name="MsgPACUpdateFailed" xml:space="preserve">
-    <value>Ошибка обновления PAC</value>
-  </data>
-  <data name="MsgPACUpdateSuccessfully" xml:space="preserve">
-    <value>PAC успешно обновлен</value>
-  </data>
   <data name="MsgParsingSuccessfully" xml:space="preserve">
     <value>Парсинг {0} прошел успешно</value>
-  </data>
-  <data name="MsgSimplifyPAC" xml:space="preserve">
-    <value>Упрощение PAC прошло успешно</value>
   </data>
   <data name="MsgStartGettingSubscriptions" xml:space="preserve">
     <value>Начинаю получать подписки</value>
   </data>
   <data name="MsgStartUpdating" xml:space="preserve">
     <value>Начинаю обновление {0}...</value>
-  </data>
-  <data name="MsgStartUpdatingPAC" xml:space="preserve">
-    <value>Начинаю обновление PAC...</value>
   </data>
   <data name="MsgSubscriptionDecodingFailed" xml:space="preserve">
     <value>Некорректное содержимое подписки</value>
@@ -284,9 +263,6 @@
   </data>
   <data name="MsgUpdateV2rayCoreSuccessfullyMore" xml:space="preserve">
     <value>Успешное обновление ядра! Перезапуск службы...</value>
-  </data>
-  <data name="NeedHttpGlobalProxy" xml:space="preserve">
-    <value>Эта функция зависит от глобального прокси-сервера HTTP, пожалуйста, сначала установите его правильно.</value>
   </data>
   <data name="NonvmessOrssProtocol" xml:space="preserve">
     <value>Не является протоколом Vmess или SS</value>
@@ -315,9 +291,6 @@
   <data name="PleaseSelectServer" xml:space="preserve">
     <value>Сначала выберите сервер</value>
   </data>
-  <data name="QuickFresh" xml:space="preserve">
-    <value>Быстрый</value>
-  </data>
   <data name="RemoveDuplicateServerResult" xml:space="preserve">
     <value>Удаление дублей завершено. Старая: {0}, Новая: {1}.</value>
   </data>
@@ -326,18 +299,6 @@
   </data>
   <data name="SaveClientConfigurationIn" xml:space="preserve">
     <value>Файл конфигурации клиента сохранен по адресу: {0}</value>
-  </data>
-  <data name="SaveServerConfigurationIn" xml:space="preserve">
-    <value>Файл конфигурации сервера сохранен по адресу: {0}</value>
-  </data>
-  <data name="SlowFresh" xml:space="preserve">
-    <value>Медленный</value>
-  </data>
-  <data name="SpeedServerTips" xml:space="preserve">
-    <value>Примечание. Эта функция зависит от глобального прокси-сервера HTTP. После тестирования вручную настройте глобальный прокси-сервер HTTP и активный узел.</value>
-  </data>
-  <data name="StartPacFailed" xml:space="preserve">
-    <value>PAC не удалось запустить. Пожалуйста, запустите эту программу от имени администратора.</value>
   </data>
   <data name="StartService" xml:space="preserve">
     <value>Запуск сервиса ({0})...</value>
@@ -356,7 +317,7 @@
     <value>Сканирование URL-адреса импорта успешна.</value>
   </data>
   <data name="TestMeOutput" xml:space="preserve">
-    <value>Пинг текущей службы: {0} мс</value>
+    <value>Задержка текущего сервера: {0} мс</value>
   </data>
   <data name="OperationSuccess" xml:space="preserve">
     <value>Операция успешна</value>
@@ -374,7 +335,7 @@
     <value>Примечания</value>
   </data>
   <data name="LvUrl" xml:space="preserve">
-    <value>Url(Необязательно)</value>
+    <value>URL (необязательно)</value>
   </data>
   <data name="LvCount" xml:space="preserve">
     <value>Количество</value>
@@ -472,9 +433,6 @@
   <data name="MsgServerTitle" xml:space="preserve">
     <value>Фильтр серверов</value>
   </data>
-  <data name="NetFrameworkRequirementsTip" xml:space="preserve">
-    <value>Для корректной работы требуется .NET Framework 4.8</value>
-  </data>
   <data name="menuCheckUpdate" xml:space="preserve">
     <value>Проверить обновления</value>
   </data>
@@ -547,6 +505,9 @@
   <data name="TbSettingsColorMode" xml:space="preserve">
     <value>Тёмный режим</value>
   </data>
+  <data name="TbSettingsFollowSystemTheme" xml:space="preserve">
+    <value>Следить за системной темой</value>
+  </data>
   <data name="TbSettingsLanguage" xml:space="preserve">
     <value>Язык (требуется перезапуск)</value>
   </data>
@@ -572,28 +533,25 @@
     <value>Очистить всю статистику</value>
   </data>
   <data name="menuPingServer" xml:space="preserve">
-    <value>Проверить пинг серверов (Ctrl+P)</value>
+    <value>Тест на задержку сервера (Ctrl+P)</value>
   </data>
   <data name="menuRealPingServer" xml:space="preserve">
-    <value>Тест на реальную задержку серверов (Ctrl+R)</value>
+    <value>Тест на реальную задержку сервера (Ctrl+R)</value>
   </data>
   <data name="menuSortServerResult" xml:space="preserve">
     <value>Сортировать по результату теста</value>
   </data>
   <data name="menuSpeedServer" xml:space="preserve">
-    <value>Проверить скорость загрузки серверов (Ctrl+T)</value>
+    <value>Тест на скорость загрузки сервера (Ctrl+T)</value>
   </data>
   <data name="menuTcpingServer" xml:space="preserve">
-    <value>Тестировать сервера с tcping (Ctrl+O)</value>
+    <value>Тест задержки с tcping (Ctrl+O)</value>
   </data>
   <data name="menuTestMe" xml:space="preserve">
     <value>Проверить текущий статус службы</value>
   </data>
   <data name="menuExport2ClientConfig" xml:space="preserve">
     <value>Экспортировать выбранный сервер для клиента</value>
-  </data>
-  <data name="menuExport2ServerConfig" xml:space="preserve">
-    <value>Экспортировать выбранный сервер для сервера</value>
   </data>
   <data name="menuExport2ShareUrl" xml:space="preserve">
     <value>Экспорт URL-адресов общего доступа в буфер обмена (Ctrl+C)</value>
@@ -686,7 +644,7 @@
     <value>Тип камуфляжа</value>
   </data>
   <data name="TbId" xml:space="preserve">
-    <value>UUID(id)</value>
+    <value>UUID (id)</value>
   </data>
   <data name="TbNetwork" xml:space="preserve">
     <value>Транспортный протокол сети</value>
@@ -698,7 +656,7 @@
     <value>Порт</value>
   </data>
   <data name="TbRemarks" xml:space="preserve">
-    <value>Псевдоним (примечания)</value>
+    <value>Примечание</value>
   </data>
   <data name="TbRequestHost" xml:space="preserve">
     <value>Маскирующий домен (хост)</value>
@@ -746,7 +704,7 @@
     <value>txtPreSocksPort</value>
   </data>
   <data name="TipPreSocksPort" xml:space="preserve">
-    <value>* После установки этого значения служба socks будет запущена с использованием V2ray для обеспечения таких функций, как отображение скорости</value>
+    <value>* После установки этого значения служба socks будет запущена с использованием sing-box для обеспечения таких функций, как отображение скорости</value>
   </data>
   <data name="TbBrowse" xml:space="preserve">
     <value>Просмотр</value>
@@ -761,22 +719,22 @@
     <value>Разрешить подключения из локальной сети</value>
   </data>
   <data name="TbSettingsAutoHideStartup" xml:space="preserve">
-    <value>Auto hide startup</value>
-  </data>
-  <data name="TbSettingsAutoTest" xml:space="preserve">
-    <value>Интервал автоматической проверки задержки в минутах</value>
-  </data>
-  <data name="TbSettingsAutoUpdate" xml:space="preserve">
-    <value>Интервал автоматического обновления подписок в часах</value>
+    <value>Автоскрытие при автозапуске</value>
   </data>
   <data name="TbSettingsAutoUpdateInterval" xml:space="preserve">
     <value>Интервал автоматического обновления Geo в часах</value>
+  </data>
+  <data name="LvAutoUpdateInterval" xml:space="preserve">
+    <value>Интервал автоматического обновления в минутах</value>
   </data>
   <data name="TbSettingsCore" xml:space="preserve">
     <value>Ядро: базовые настройки</value>
   </data>
   <data name="TbSettingsCoreDns" xml:space="preserve">
-    <value>Ядро: настройки DNS</value>
+    <value>Настройки DNS V2ray</value>
+  </data>
+  <data name="TbSettingsCoreDnsSingbox" xml:space="preserve">
+    <value>Настройки DNS sing-box</value>
   </data>
   <data name="TbSettingsCoreKcp" xml:space="preserve">
     <value>Ядро: настройки KCP</value>
@@ -808,9 +766,6 @@
   <data name="TbSettingsIgnoreGeoUpdateCore" xml:space="preserve">
     <value>Игнорировать файлы Geo при обновлении ядра</value>
   </data>
-  <data name="TbSettingsIpv6" xml:space="preserve">
-    <value>Включить IPv6</value>
-  </data>
   <data name="TbSettingsKeepOlderDedupl" xml:space="preserve">
     <value>Сохранить старые при удалении дублей</value>
   </data>
@@ -826,17 +781,11 @@
   <data name="TbSettingsN" xml:space="preserve">
     <value>Настройки v2rayN</value>
   </data>
-  <data name="TbSettingsPacListenPort" xml:space="preserve">
-    <value>Порт PAC</value>
-  </data>
   <data name="TbSettingsPass" xml:space="preserve">
     <value>Пароль аутентификации</value>
   </data>
   <data name="TbSettingsRemoteDNS" xml:space="preserve">
     <value>Пользовательский DNS (если несколько делите с запятыми (,))</value>
-  </data>
-  <data name="TbSettingsSaveTip" xml:space="preserve">
-    <value>После изменения следующих параметров нажмите «Сохранить», чтобы изменения вступили в силу</value>
   </data>
   <data name="TbSettingsSetUWP" xml:space="preserve">
     <value>Set Win10 UWP Loopback</value>
@@ -853,9 +802,6 @@
   <data name="TbSettingsStatistics" xml:space="preserve">
     <value>Включить статистику (требуется перезагрузка)</value>
   </data>
-  <data name="TbSettingsStatisticsFreshRate" xml:space="preserve">
-    <value>Частота обновления статистики в секундах</value>
-  </data>
   <data name="TbSettingsSubConvert" xml:space="preserve">
     <value>URL-адрес конверсии подписки</value>
   </data>
@@ -866,7 +812,7 @@
     <value>Включить протокол безопасности TLS v1.3 (обновление подписки)</value>
   </data>
   <data name="TbSettingsTrayMenuServersLimit" xml:space="preserve">
-    <value>Tray right-click menu servers display limit</value>
+    <value>Лимит серверов в меню трея</value>
   </data>
   <data name="TbSettingsUdpEnabled" xml:space="preserve">
     <value>Включить UDP</value>
@@ -995,7 +941,7 @@
     <value>Список правил</value>
   </data>
   <data name="menuRuleRemove" xml:space="preserve">
-    <value>Удалить правила</value>
+    <value>Удалить правила (Delete)</value>
   </data>
   <data name="menuRoutingRuleDetailsSetting" xml:space="preserve">
     <value>RoutingRuleDetailsSetting</value>
@@ -1010,7 +956,7 @@
     <value>Поддержка DnsObject</value>
   </data>
   <data name="SubUrlTips" xml:space="preserve">
-    <value>Group please leave blank here</value>
+    <value>Необязательное поле</value>
   </data>
   <data name="TipChangeRouting" xml:space="preserve">
     <value>Настройки маршрутизации изменены</value>
@@ -1022,7 +968,7 @@
     <value>Только маршрут</value>
   </data>
   <data name="menuMixedTestServer" xml:space="preserve">
-    <value>Тест задержки и скорости (Ctrl+E)</value>
+    <value>Тест задержки и скорости всех серверов (Ctrl+E)</value>
   </data>
   <data name="LvTestDelay" xml:space="preserve">
     <value>Задержка (ms)</value>
@@ -1043,7 +989,7 @@
     <value>Импортировать старый конфиг guiNConfig</value>
   </data>
   <data name="TbEnableTunAs" xml:space="preserve">
-    <value>Включить интерфейс</value>
+    <value>Режим VPN</value>
   </data>
   <data name="TbSettingsNewPort4LAN" xml:space="preserve">
     <value>Новый порт для локальной сети</value>
@@ -1107,5 +1053,23 @@
   </data>
   <data name="TbSettingsFontSize" xml:space="preserve">
     <value>Размер шрифта</value>
+  </data>
+  <data name="TbSettingsEnableHWA" xml:space="preserve">
+    <value>Включить аппаратное ускорение (требуется перезагрузка)</value>
+  </data>
+  <data name="menuRebootAsAdmin" xml:space="preserve">
+    <value>Перезагрузить как администратор</value>
+  </data>
+  <data name="menuDNSSetting" xml:space="preserve">
+    <value>Настройки DNS</value>
+  </data>
+  <data name="TbSettingsLogEnabledToFile" xml:space="preserve">
+    <value>Включить логгирование в файл</value>
+  </data>
+  <data name="TbSettingsSpeedTestTimeout" xml:space="preserve">
+    <value>Таймаут одиночного спидтеста</value>
+  </data>
+  <data name="TbSettingsSpeedTestUrl" xml:space="preserve">
+    <value>URL спидтеста</value>
   </data>
 </root>

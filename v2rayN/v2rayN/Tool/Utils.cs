@@ -18,7 +18,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Windows.Forms;
+using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -31,9 +31,8 @@ using ZXing.Windows.Compatibility;
 
 namespace v2rayN
 {
-    class Utils
+    internal class Utils
     {
-
         #region 资源Json操作
 
         /// <summary>
@@ -59,7 +58,6 @@ namespace v2rayN
             }
             return result;
         }
-
 
         /// <summary>
         /// 取得存储资源
@@ -178,7 +176,8 @@ namespace v2rayN
                 return null;
             }
         }
-        #endregion
+
+        #endregion 资源Json操作
 
         #region 转换函数
 
@@ -210,6 +209,7 @@ namespace v2rayN
                 return string.Empty;
             }
         }
+
         /// <summary>
         /// 逗号分隔的字符串,转List<string>
         /// </summary>
@@ -282,6 +282,8 @@ namespace v2rayN
                   .Replace(Environment.NewLine, "")
                   .Replace("\n", "")
                   .Replace("\r", "")
+                  .Replace('_', '/')
+                  .Replace('-', '+')
                   .Replace(" ", "");
 
                 if (plainText.Length % 4 > 0)
@@ -312,10 +314,11 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                //SaveLog(ex.Message, ex);
                 return 0;
             }
         }
+
         public static bool ToBool(object obj)
         {
             try
@@ -324,7 +327,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                //SaveLog(ex.Message, ex);
                 return false;
             }
         }
@@ -337,7 +340,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                //SaveLog(ex.Message, ex);
                 return string.Empty;
             }
         }
@@ -365,23 +368,22 @@ namespace v2rayN
                     if (GBs > 0)
                     {
                         // multi GB
-                        /*ulong TBs = GBs / factor;
+                        long TBs = GBs / factor;
                         if (TBs > 0)
                         {
-                            // 你是魔鬼吗？ 用这么多流量
-                            result = TBs + GBs % factor / (factor + 0.0);
+                            result = TBs + ((GBs % factor) / (factor + 0.0));
                             unit = "TB";
                             return;
-                        }*/
-                        result = GBs + MBs % factor / (factor + 0.0);
+                        }
+                        result = GBs + ((MBs % factor) / (factor + 0.0));
                         unit = "GB";
                         return;
                     }
-                    result = MBs + KBs % factor / (factor + 0.0);
+                    result = MBs + ((KBs % factor) / (factor + 0.0));
                     unit = "MB";
                     return;
                 }
-                result = KBs + amount % factor / (factor + 0.0);
+                result = KBs + ((amount % factor) / (factor + 0.0));
                 unit = "KB";
                 return;
             }
@@ -403,6 +405,7 @@ namespace v2rayN
             return Uri.EscapeDataString(url);
             //return  HttpUtility.UrlEncode(url);
         }
+
         public static string UrlDecode(string url)
         {
             return HttpUtility.UrlDecode(url);
@@ -419,6 +422,7 @@ namespace v2rayN
             }
             return sb.ToString();
         }
+
         public static ImageSource IconToImageSource(Icon icon)
         {
             return Imaging.CreateBitmapSourceFromHIcon(
@@ -427,6 +431,11 @@ namespace v2rayN
                 BitmapSizeOptions.FromEmptyOptions());
         }
 
+        /// <summary>
+        /// idn to idc
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public static string GetPunycode(string url)
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -451,8 +460,22 @@ namespace v2rayN
             }
         }
 
-        #endregion
+        public static bool IsBase64String(string plainText)
+        {
+            var buffer = new Span<byte>(new byte[plainText.Length]);
+            return Convert.TryFromBase64String(plainText, buffer, out int _);
+        }
 
+        public static string Convert2Comma(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+            return text.Replace("，", ",").Replace(Environment.NewLine, ",");
+        }
+
+        #endregion 转换函数
 
         #region 数据检查
 
@@ -496,7 +519,7 @@ namespace v2rayN
         /// <summary>
         /// 验证IP地址是否合法
         /// </summary>
-        /// <param name="ip"></param>        
+        /// <param name="ip"></param>
         public static bool IsIP(string ip)
         {
             //如果为空
@@ -521,7 +544,6 @@ namespace v2rayN
                 }
             }
 
-
             //模式字符串
             string pattern = @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$";
 
@@ -532,7 +554,7 @@ namespace v2rayN
         /// <summary>
         /// 验证Domain地址是否合法
         /// </summary>
-        /// <param name="domain"></param>        
+        /// <param name="domain"></param>
         public static bool IsDomain(string domain)
         {
             //如果为空
@@ -541,21 +563,14 @@ namespace v2rayN
                 return false;
             }
 
-            //清除要验证字符串中的空格
-            //domain = domain.TrimEx();
-
-            //模式字符串
-            string pattern = @"^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
-
-            //验证
-            return IsMatch(domain, pattern);
+            return Uri.CheckHostName(domain) == UriHostNameType.Dns;
         }
 
         /// <summary>
         /// 验证输入字符串是否与模式字符串匹配，匹配返回true
         /// </summary>
         /// <param name="input">输入字符串</param>
-        /// <param name="pattern">模式字符串</param>        
+        /// <param name="pattern">模式字符串</param>
         public static bool IsMatch(string input, string pattern)
         {
             return Regex.IsMatch(input, pattern, RegexOptions.IgnoreCase);
@@ -575,10 +590,9 @@ namespace v2rayN
             return false;
         }
 
-        #endregion
+        #endregion 数据检查
 
         #region 开机自动启动
-
 
         /// <summary>
         /// 开机自动启动
@@ -665,12 +679,12 @@ namespace v2rayN
         /// <returns></returns>
         public static string GetExePath()
         {
-            return Application.ExecutablePath;
+            return Environment.ProcessPath;
         }
 
         public static string StartupPath()
         {
-            return Application.StartupPath;
+            return AppDomain.CurrentDomain.BaseDirectory;
         }
 
         public static string? RegReadValue(string path, string name, string def)
@@ -778,14 +792,14 @@ namespace v2rayN
             task.Settings.RunOnlyIfIdle = false;
             task.Settings.IdleSettings.StopOnIdleEnd = false;
             task.Settings.ExecutionTimeLimit = TimeSpan.Zero;
-            task.Triggers.Add(new LogonTrigger { UserId = logonUser, Delay = TimeSpan.FromMinutes(1) });
+            task.Triggers.Add(new LogonTrigger { UserId = logonUser, Delay = TimeSpan.FromSeconds(10) });
             task.Principal.RunLevel = TaskRunLevel.Highest;
             task.Actions.Add(new ExecAction(deamonFileName));
 
             taskService.RootFolder.RegisterTaskDefinition(TaskName, task);
         }
 
-        #endregion
+        #endregion 开机自动启动
 
         #region 测速
 
@@ -850,7 +864,8 @@ namespace v2rayN
             }
             return inUse;
         }
-        #endregion
+
+        #endregion 测速
 
         #region 杂项
 
@@ -907,13 +922,13 @@ namespace v2rayN
         /// <returns></returns>
         public static string? GetClipboardData()
         {
-            string strData = string.Empty;
+            string? strData = string.Empty;
             try
             {
                 IDataObject data = Clipboard.GetDataObject();
                 if (data.GetDataPresent(DataFormats.UnicodeText))
                 {
-                    strData = data.GetData(DataFormats.UnicodeText).ToString();
+                    strData = data.GetData(DataFormats.UnicodeText)?.ToString();
                 }
                 return strData;
             }
@@ -983,7 +998,6 @@ namespace v2rayN
             }
         }
 
-
         public static string GetDownloadFileName(string url)
         {
             var fileName = Path.GetFileName(url);
@@ -1010,6 +1024,7 @@ namespace v2rayN
         {
             return Guid.TryParse(strSrc, out Guid g);
         }
+
         public static void ProcessStart(string fileName)
         {
             try
@@ -1031,7 +1046,15 @@ namespace v2rayN
             DwmSetWindowAttribute(hWnd, DWMWINDOWATTRIBUTE.DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1, ref attribute, attributeSize);
             DwmSetWindowAttribute(hWnd, DWMWINDOWATTRIBUTE.DWMWA_USE_IMMERSIVE_DARK_MODE, ref attribute, attributeSize);
         }
-        #endregion
+
+        public static bool IsLightTheme()
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+            var value = key?.GetValue("AppsUseLightTheme");
+            return value is int i && i > 0;
+        }
+
+        #endregion 杂项
 
         #region TempPath
 
@@ -1071,6 +1094,7 @@ namespace v2rayN
             }
             return Path.Combine(_tempPath, filename);
         }
+
         public static string GetConfigPath(string filename = "")
         {
             string _tempPath = Path.Combine(StartupPath(), "guiConfigs");
@@ -1087,6 +1111,7 @@ namespace v2rayN
                 return Path.Combine(_tempPath, filename);
             }
         }
+
         public static string GetBinPath(string filename, ECoreType? coreType = null)
         {
             string _tempPath = Path.Combine(StartupPath(), "bin");
@@ -1111,6 +1136,7 @@ namespace v2rayN
                 return Path.Combine(_tempPath, filename);
             }
         }
+
         public static string GetLogPath(string filename = "")
         {
             string _tempPath = Path.Combine(StartupPath(), "guiLogs");
@@ -1127,6 +1153,7 @@ namespace v2rayN
                 return Path.Combine(_tempPath, filename);
             }
         }
+
         public static string GetFontsPath(string filename = "")
         {
             string _tempPath = Path.Combine(StartupPath(), "guiFonts");
@@ -1144,72 +1171,75 @@ namespace v2rayN
             }
         }
 
-        #endregion
+        #endregion TempPath
 
         #region Log
 
         public static void SaveLog(string strContent)
         {
-            var logger = LogManager.GetLogger("Log1");
-            logger.Info(strContent);
-        }
-        public static void SaveLog(string strTitle, Exception ex)
-        {
-            var logger = LogManager.GetLogger("Log2");
-            logger.Debug($"{strTitle},{ex.Message}");
-            logger.Debug(ex.StackTrace);
-            if (ex?.InnerException != null)
+            if (LogManager.IsLoggingEnabled())
             {
-                logger.Error(ex.InnerException);
+                var logger = LogManager.GetLogger("Log1");
+                logger.Info(strContent);
             }
         }
 
-        #endregion
+        public static void SaveLog(string strTitle, Exception ex)
+        {
+            if (LogManager.IsLoggingEnabled())
+            {
+                var logger = LogManager.GetLogger("Log2");
+                logger.Debug($"{strTitle},{ex.Message}");
+                logger.Debug(ex.StackTrace);
+                if (ex?.InnerException != null)
+                {
+                    logger.Error(ex.InnerException);
+                }
+            }
+        }
 
+        #endregion Log
 
         #region scan screen
 
-        public static string ScanScreen()
+        public static string ScanScreen(float dpiX, float dpiY)
         {
             try
             {
-                foreach (Screen screen in Screen.AllScreens)
+                var left = (int)(SystemParameters.WorkArea.Left);
+                var top = (int)(SystemParameters.WorkArea.Top);
+                var width = (int)(SystemParameters.WorkArea.Width / dpiX);
+                var height = (int)(SystemParameters.WorkArea.Height / dpiY);
+
+                using Bitmap fullImage = new Bitmap(width, height);
+                using (Graphics g = Graphics.FromImage(fullImage))
                 {
-                    using Bitmap fullImage = new Bitmap(screen.Bounds.Width,
-                                                    screen.Bounds.Height);
-                    using (Graphics g = Graphics.FromImage(fullImage))
+                    g.CopyFromScreen(left, top, 0, 0, fullImage.Size, CopyPixelOperation.SourceCopy);
+                }
+                int maxTry = 10;
+                for (int i = 0; i < maxTry; i++)
+                {
+                    int marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
+                    int marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
+                    Rectangle cropRect = new(marginLeft, marginTop, fullImage.Width - marginLeft * 2, fullImage.Height - marginTop * 2);
+                    Bitmap target = new(width, height);
+
+                    double imageScale = (double)width / (double)cropRect.Width;
+                    using (Graphics g = Graphics.FromImage(target))
                     {
-                        g.CopyFromScreen(screen.Bounds.X,
-                                         screen.Bounds.Y,
-                                         0, 0,
-                                         fullImage.Size,
-                                         CopyPixelOperation.SourceCopy);
+                        g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
+                                        cropRect,
+                                        GraphicsUnit.Pixel);
                     }
-                    int maxTry = 10;
-                    for (int i = 0; i < maxTry; i++)
+
+                    BitmapLuminanceSource source = new(target);
+                    BinaryBitmap bitmap = new(new HybridBinarizer(source));
+                    QRCodeReader reader = new();
+                    Result result = reader.decode(bitmap);
+                    if (result != null)
                     {
-                        int marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
-                        int marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
-                        Rectangle cropRect = new(marginLeft, marginTop, fullImage.Width - marginLeft * 2, fullImage.Height - marginTop * 2);
-                        Bitmap target = new(screen.Bounds.Width, screen.Bounds.Height);
-
-                        double imageScale = (double)screen.Bounds.Width / (double)cropRect.Width;
-                        using (Graphics g = Graphics.FromImage(target))
-                        {
-                            g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
-                                            cropRect,
-                                            GraphicsUnit.Pixel);
-                        }
-
-                        BitmapLuminanceSource source = new(target);
-                        BinaryBitmap bitmap = new(new HybridBinarizer(source));
-                        QRCodeReader reader = new();
-                        Result result = reader.decode(bitmap);
-                        if (result != null)
-                        {
-                            string ret = result.Text;
-                            return ret;
-                        }
+                        string ret = result.Text;
+                        return ret;
                     }
                 }
             }
@@ -1220,11 +1250,17 @@ namespace v2rayN
             return string.Empty;
         }
 
-        #endregion
+        public static Tuple<float, float> GetDpiXY(Window window)
+        {
+            IntPtr hWnd = new WindowInteropHelper(window).EnsureHandle();
+            Graphics g = Graphics.FromHwnd(hWnd);
 
+            return new(96 / g.DpiX, 96 / g.DpiY);
+        }
+
+        #endregion scan screen
 
         #region Windows API
-
 
         [Flags]
         public enum DWMWINDOWATTRIBUTE : uint
@@ -1236,6 +1272,6 @@ namespace v2rayN
         [DllImport("dwmapi.dll")]
         public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attribute, ref int attributeValue, uint attributeSize);
 
-        #endregion
+        #endregion Windows API
     }
 }

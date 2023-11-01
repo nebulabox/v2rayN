@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace PacLib;
@@ -17,11 +16,10 @@ public class PacHandler
     private static bool _isRunning;
     private static bool _needRestart = true;
 
-
     public static void Start(string configPath, int httpPort, int pacPort)
     {
         _needRestart = (configPath != _configPath || httpPort != _httpPort || pacPort != _pacPort || !_isRunning);
-      
+
         _configPath = configPath;
         _httpPort = httpPort;
         _pacPort = pacPort;
@@ -51,7 +49,7 @@ public class PacHandler
         _tcpListener = TcpListener.Create(_pacPort);
         _isRunning = true;
         _tcpListener.Start();
-        Task.Factory.StartNew(() =>
+        Task.Factory.StartNew(async () =>
         {
             while (_isRunning)
             {
@@ -59,33 +57,31 @@ public class PacHandler
                 {
                     if (!_tcpListener.Pending())
                     {
-                        Thread.Sleep(10);
+                        await Task.Delay(10);
                         continue;
                     }
 
                     var client = _tcpListener.AcceptTcpClient();
-                    Task.Run(() =>
-                    {
-                        var stream = client.GetStream();
-                        var sb = new StringBuilder();
-                        sb.AppendLine("HTTP/1.0 200 OK");
-                        sb.AppendLine("Content-type:application/x-ns-proxy-autoconfig");
-                        sb.AppendLine("Connection:close");
-                        sb.AppendLine("Content-Length:" + Encoding.UTF8.GetByteCount(_pacText));
-                        sb.AppendLine();
-                        sb.Append(_pacText);
-                        var content = Encoding.UTF8.GetBytes(sb.ToString());
-                        stream.Write(content, 0, content.Length);
-                        stream.Flush();
-                    });
+                    await Task.Run(() =>
+                      {
+                          var stream = client.GetStream();
+                          var sb = new StringBuilder();
+                          sb.AppendLine("HTTP/1.0 200 OK");
+                          sb.AppendLine("Content-type:application/x-ns-proxy-autoconfig");
+                          sb.AppendLine("Connection:close");
+                          sb.AppendLine("Content-Length:" + Encoding.UTF8.GetByteCount(_pacText));
+                          sb.AppendLine();
+                          sb.Append(_pacText);
+                          var content = Encoding.UTF8.GetBytes(sb.ToString());
+                          stream.Write(content, 0, content.Length);
+                          stream.Flush();
+                      });
                 }
                 catch (Exception e)
                 {
                 }
             }
-
         }, TaskCreationOptions.LongRunning);
-
     }
 
     public static void Stop()
