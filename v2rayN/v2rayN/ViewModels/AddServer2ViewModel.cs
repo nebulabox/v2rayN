@@ -1,4 +1,3 @@
-using Microsoft.Win32;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Helpers;
@@ -6,7 +5,6 @@ using Splat;
 using System.IO;
 using System.Reactive;
 using System.Windows;
-using v2rayN.Base;
 using v2rayN.Handler;
 using v2rayN.Mode;
 using v2rayN.Resx;
@@ -38,7 +36,7 @@ namespace v2rayN.ViewModels
             }
             else
             {
-                SelectedSource = Utils.DeepCopy(profileItem);
+                SelectedSource = JsonUtils.DeepCopy(profileItem);
             }
 
             _view = view;
@@ -90,7 +88,7 @@ namespace v2rayN.ViewModels
                 item.preSocksPort = SelectedSource.preSocksPort;
             }
 
-            if (ConfigHandler.EditCustomServer(ref _config, item) == 0)
+            if (ConfigHandler.EditCustomServer(_config, item) == 0)
             {
                 _noticeHandler?.Enqueue(ResUI.OperationSuccess);
                 _view.DialogResult = true;
@@ -105,29 +103,25 @@ namespace v2rayN.ViewModels
         {
             UI.Show(ResUI.CustomServerTips);
 
-            OpenFileDialog fileDialog = new()
-            {
-                Multiselect = false,
-                Filter = "Config|*.json|YAML|*.yaml;*.yml|All|*.*"
-            };
-            if (fileDialog.ShowDialog() != true)
+            if (UI.OpenFileDialog(out string fileName,
+                "Config|*.json|YAML|*.yaml;*.yml|All|*.*") != true)
             {
                 return;
             }
-            string fileName = fileDialog.FileName;
             if (Utils.IsNullOrEmpty(fileName))
             {
                 return;
             }
+
             var item = LazyConfig.Instance.GetProfileItem(SelectedSource.indexId);
             item ??= SelectedSource;
             item.address = fileName;
-            if (ConfigHandler.AddCustomServer(ref _config, item, false) == 0)
+            if (ConfigHandler.AddCustomServer(_config, item, false) == 0)
             {
                 _noticeHandler?.Enqueue(ResUI.SuccessfullyImportedCustomServer);
                 if (!Utils.IsNullOrEmpty(item.indexId))
                 {
-                    SelectedSource = Utils.DeepCopy(item);
+                    SelectedSource = JsonUtils.DeepCopy(item);
                 }
                 IsModified = true;
             }

@@ -187,10 +187,10 @@
     <value>初始化配置</value>
   </data>
   <data name="IsLatestCore" xml:space="preserve">
-    <value>{0} 已是最新版本。</value>
+    <value>{0} {1} 已是最新版本。</value>
   </data>
   <data name="IsLatestN" xml:space="preserve">
-    <value>{0} 已是最新版本。</value>
+    <value>{0} {1} 已是最新版本。</value>
   </data>
   <data name="LvAddress" xml:space="preserve">
     <value>位址</value>
@@ -929,7 +929,7 @@
     <value>新增規則</value>
   </data>
   <data name="menuRuleExportSelected" xml:space="preserve">
-    <value>到處所選規則至剪貼簿</value>
+    <value>匯出所選規則至剪貼簿</value>
   </data>
   <data name="menuRuleList" xml:space="preserve">
     <value>規則列表</value>
@@ -1037,7 +1037,7 @@
     <value>目前字型(需重啟)</value>
   </data>
   <data name="TbSettingsCurrentFontFamilyTip" xml:space="preserve">
-    <value>複製字型TTF文件到目錄guiFonts，重啟設定</value>
+    <value>複製字型TTF/TTC文件到目錄guiFonts，重啟設定</value>
   </data>
   <data name="TbSettingsSocksPortTip" xml:space="preserve">
     <value>http埠=socks埠+1</value>
@@ -1082,7 +1082,7 @@
     <value>啟用硬體加速(需重啟)</value>
   </data>
   <data name="SpeedtestingWait" xml:space="preserve">
-    <value>等待測試中...</value>
+    <value>等待測試中......</value>
   </data>
   <data name="TipDisplayLog" xml:space="preserve">
     <value>當有異常斷流時請關閉</value>
@@ -1117,7 +1117,7 @@
   <data name="TbDnsSingboxObjectDoc" xml:space="preserve">
     <value>請填寫 DNS JSON 結構，點擊查看文件</value>
   </data>
-  <data name="TBSettingDnsImportDefConfig" xml:space="preserve">
+  <data name="TbSettingDnsImportDefConfig" xml:space="preserve">
     <value>點擊匯入預設DNS配置</value>
   </data>
   <data name="TbdomainStrategy4Singbox" xml:space="preserve">
@@ -1134,5 +1134,23 @@
   </data>
   <data name="TbRoutingRuleIP" xml:space="preserve">
     <value>IP 或 IP CIDR</value>
+  </data>
+  <data name="menuAddTuicServer" xml:space="preserve">
+    <value>新增[Tuic]伺服器</value>
+  </data>
+  <data name="LvPrevProfile" xml:space="preserve">
+    <value>前置代理別名</value>
+  </data>
+  <data name="LvNextProfile" xml:space="preserve">
+    <value>落地代理別名</value>
+  </data>
+  <data name="LvPrevProfileTip" xml:space="preserve">
+    <value>請確保別名存在並且唯一</value>
+  </data>
+  <data name="TbSettingsEnableExInbound" xml:space="preserve">
+    <value>啟用額外監聽端口</value>
+  </data>
+  <data name="TbSettingsEnableIPv6Address" xml:space="preserve">
+    <value>啟用IPv6</value>
   </data>
 </root>

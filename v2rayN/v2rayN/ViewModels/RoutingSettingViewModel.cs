@@ -4,7 +4,6 @@ using ReactiveUI.Fody.Helpers;
 using Splat;
 using System.Reactive;
 using System.Windows;
-using v2rayN.Base;
 using v2rayN.Handler;
 using v2rayN.Mode;
 using v2rayN.Resx;
@@ -81,7 +80,7 @@ namespace v2rayN.ViewModels
             _view = view;
             SelectedSource = new();
 
-            ConfigHandler.InitBuiltinRouting(ref _config);
+            ConfigHandler.InitBuiltinRouting(_config);
 
             enableRoutingAdvanced = _config.routingBasicItem.enableRoutingAdvanced;
             domainStrategy = _config.routingBasicItem.domainStrategy;
@@ -134,10 +133,10 @@ namespace v2rayN.ViewModels
 
         private void BindingLockedData()
         {
-            _lockedItem = ConfigHandler.GetLockedRoutingItem(ref _config);
+            _lockedItem = ConfigHandler.GetLockedRoutingItem(_config);
             if (_lockedItem != null)
             {
-                _lockedRules = Utils.FromJson<List<RulesItem>>(_lockedItem.ruleSet);
+                _lockedRules = JsonUtils.Deserialize<List<RulesItem>>(_lockedItem.ruleSet);
                 ProxyDomain = Utils.List2String(_lockedRules[0].domain, true);
                 ProxyIP = Utils.List2String(_lockedRules[0].ip, true);
 
@@ -162,9 +161,9 @@ namespace v2rayN.ViewModels
                 _lockedRules[2].domain = Utils.String2List(Utils.Convert2Comma(BlockDomain.TrimEx()));
                 _lockedRules[2].ip = Utils.String2List(Utils.Convert2Comma(BlockIP.TrimEx()));
 
-                _lockedItem.ruleSet = Utils.ToJson(_lockedRules, false);
+                _lockedItem.ruleSet = JsonUtils.Serialize(_lockedRules, false);
 
-                ConfigHandler.SaveRoutingItem(ref _config, _lockedItem);
+                ConfigHandler.SaveRoutingItem(_config, _lockedItem);
             }
         }
 
@@ -208,7 +207,7 @@ namespace v2rayN.ViewModels
 
             EndBindingLockedData();
 
-            if (ConfigHandler.SaveConfig(ref _config) == 0)
+            if (ConfigHandler.SaveConfig(_config) == 0)
             {
                 _noticeHandler?.Enqueue(ResUI.OperationSuccess);
                 _view.DialogResult = true;
@@ -289,7 +288,7 @@ namespace v2rayN.ViewModels
                 return;
             }
 
-            if (ConfigHandler.SetDefaultRouting(ref _config, item) == 0)
+            if (ConfigHandler.SetDefaultRouting(_config, item) == 0)
             {
                 RefreshRoutingItems();
                 IsModified = true;
@@ -298,7 +297,7 @@ namespace v2rayN.ViewModels
 
         private void RoutingAdvancedImportRules()
         {
-            if (ConfigHandler.InitBuiltinRouting(ref _config, true) == 0)
+            if (ConfigHandler.InitBuiltinRouting(_config, true) == 0)
             {
                 RefreshRoutingItems();
                 IsModified = true;

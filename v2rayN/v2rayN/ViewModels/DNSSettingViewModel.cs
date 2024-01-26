@@ -15,6 +15,7 @@ namespace v2rayN.ViewModels
         private NoticeHandler? _noticeHandler;
         private Window _view;
 
+        [Reactive] public bool useSystemHosts { get; set; }
         [Reactive] public string domainStrategy4Freedom { get; set; }
         [Reactive] public string normalDNS { get; set; }
         [Reactive] public string normalDNS2 { get; set; }
@@ -31,6 +32,7 @@ namespace v2rayN.ViewModels
             _view = view;
 
             var item = LazyConfig.Instance.GetDNSItem(ECoreType.Xray);
+            useSystemHosts = item.useSystemHosts;
             domainStrategy4Freedom = item?.domainStrategy4Freedom!;
             normalDNS = item?.normalDNS!;
 
@@ -61,7 +63,7 @@ namespace v2rayN.ViewModels
         {
             if (!Utils.IsNullOrEmpty(normalDNS))
             {
-                var obj = Utils.ParseJson(normalDNS);
+                var obj = JsonUtils.ParseJson(normalDNS);
                 if (obj != null && obj.ContainsKey("servers") == true)
                 {
                 }
@@ -76,7 +78,7 @@ namespace v2rayN.ViewModels
             }
             if (!Utils.IsNullOrEmpty(normalDNS2))
             {
-                var obj2 = Utils.FromJson<Dns4Sbox>(normalDNS2);
+                var obj2 = JsonUtils.Deserialize<Dns4Sbox>(normalDNS2);
                 if (obj2 == null)
                 {
                     UI.Show(ResUI.FillCorrectDNSText);
@@ -85,7 +87,7 @@ namespace v2rayN.ViewModels
             }
             if (!Utils.IsNullOrEmpty(tunDNS2))
             {
-                var obj2 = Utils.FromJson<Dns4Sbox>(tunDNS2);
+                var obj2 = JsonUtils.Deserialize<Dns4Sbox>(tunDNS2);
                 if (obj2 == null)
                 {
                     UI.Show(ResUI.FillCorrectDNSText);
@@ -95,12 +97,13 @@ namespace v2rayN.ViewModels
 
             var item = LazyConfig.Instance.GetDNSItem(ECoreType.Xray);
             item.domainStrategy4Freedom = domainStrategy4Freedom;
+            item.useSystemHosts = useSystemHosts;
             item.normalDNS = normalDNS;
             ConfigHandler.SaveDNSItems(_config, item);
 
             var item2 = LazyConfig.Instance.GetDNSItem(ECoreType.sing_box);
-            item2.normalDNS = Utils.ToJson(Utils.ParseJson(normalDNS2));
-            item2.tunDNS = Utils.ToJson(Utils.ParseJson(tunDNS2));
+            item2.normalDNS = JsonUtils.Serialize(JsonUtils.ParseJson(normalDNS2));
+            item2.tunDNS = JsonUtils.Serialize(JsonUtils.ParseJson(tunDNS2));
             ConfigHandler.SaveDNSItems(_config, item2);
 
             _noticeHandler?.Enqueue(ResUI.OperationSuccess);

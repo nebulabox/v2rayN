@@ -26,8 +26,8 @@
     <DockPanel Margin="8">
         <Grid HorizontalAlignment="Center" DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="150" />
             </Grid.ColumnDefinitions>
             <Button
                 x:Name="btnSave"
@@ -40,7 +40,6 @@
                 x:Name="btnCancel"
                 Grid.Column="1"
                 Margin="4"
-                Click="btnCancel_Click"
                 Content="{x:Static resx:ResUI.TbCancel}"
                 Cursor="Hand"
                 IsCancel="true"
@@ -64,6 +63,20 @@
                             Style="{StaticResource DefComboBox}" />
                     </StackPanel>
 
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="{StaticResource SettingItemMargin}"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ToolbarTextBlock}"
+                            Text="{x:Static resx:ResUI.TbSettingsUseSystemHosts}" />
+                        <ToggleButton
+                            x:Name="togUseSystemHosts"
+                            Grid.Row="5"
+                            Grid.Column="1"
+                            Margin="{StaticResource SettingItemMargin}"
+                            HorizontalAlignment="Left" />
+                    </StackPanel>
+
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                         <TextBlock
                             Margin="{StaticResource SettingItemMargin}"
@@ -81,7 +94,7 @@
                         <Button
                             x:Name="btnImportDefConfig4V2ray"
                             Margin="8,0,0,0"
-                            Content="{x:Static resx:ResUI.TBSettingDnsImportDefConfig}"
+                            Content="{x:Static resx:ResUI.TbSettingDnsImportDefConfig}"
                             Cursor="Hand"
                             Style="{StaticResource DefButton}" />
                     </StackPanel>
@@ -113,7 +126,7 @@
                         <Button
                             x:Name="btnImportDefConfig4Singbox"
                             Margin="8,0,0,0"
-                            Content="{x:Static resx:ResUI.TBSettingDnsImportDefConfig}"
+                            Content="{x:Static resx:ResUI.TbSettingDnsImportDefConfig}"
                             Cursor="Hand"
                             Style="{StaticResource DefButton}" />
                     </StackPanel>

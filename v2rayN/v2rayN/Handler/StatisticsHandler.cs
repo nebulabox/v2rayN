@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using v2rayN.Base;
 using v2rayN.Mode;
 
 namespace v2rayN.Handler
@@ -29,7 +28,7 @@ namespace v2rayN.Handler
             _updateFunc = update;
 
             Init();
-            Global.statePort = GetFreePort();
+            Global.StatePort = GetFreePort();
 
             _statisticsV2Ray = new StatisticsV2ray(config, UpdateServerStat);
             _statisticsSingbox = new StatisticsSingbox(config, UpdateServerStat);
@@ -44,7 +43,7 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
         }
 
@@ -63,7 +62,7 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
         }
 
@@ -143,14 +142,12 @@ namespace v2rayN.Handler
                 {
                     return defaultPort;
                 }
-                for (int i = 0; i < 3; i++)
-                {
-                    TcpListener l = new(IPAddress.Loopback, 0);
-                    l.Start();
-                    int port = ((IPEndPoint)l.LocalEndpoint).Port;
-                    l.Stop();
-                    return port;
-                }
+
+                TcpListener l = new(IPAddress.Loopback, 0);
+                l.Start();
+                int port = ((IPEndPoint)l.LocalEndpoint).Port;
+                l.Stop();
+                return port;
             }
             catch
             {

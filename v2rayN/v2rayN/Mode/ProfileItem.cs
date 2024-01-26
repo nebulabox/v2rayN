@@ -1,5 +1,4 @@
 ﻿using SQLite;
-using v2rayN.Base;
 
 namespace v2rayN.Mode
 {
@@ -48,16 +47,12 @@ namespace v2rayN.Mode
             }
             switch (configType)
             {
-                case EConfigType.VMess:
-                case EConfigType.Shadowsocks:
-                case EConfigType.Socks:
-                case EConfigType.VLESS:
-                case EConfigType.Trojan:
-                    summary += string.Format("{0}({1}:{2})", remarks, addr, port);
+                case EConfigType.Custom:
+                    summary += string.Format("{0}", remarks);
                     break;
 
                 default:
-                    summary += string.Format("{0}", remarks);
+                    summary += string.Format("{0}({1}:{2})", remarks, addr, port);
                     break;
             }
             return summary;
@@ -77,7 +72,7 @@ namespace v2rayN.Mode
 
         public string GetNetwork()
         {
-            if (Utils.IsNullOrEmpty(network) || !Global.networks.Contains(network))
+            if (Utils.IsNullOrEmpty(network) || !Global.Networks.Contains(network))
             {
                 return Global.DefaultNetwork;
             }

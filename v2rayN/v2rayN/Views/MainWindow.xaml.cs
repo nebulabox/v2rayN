@@ -86,6 +86,9 @@ namespace v2rayN.Views
                 this.BindCommand(ViewModel, vm => vm.AddShadowsocksServerCmd, v => v.menuAddShadowsocksServer).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.AddSocksServerCmd, v => v.menuAddSocksServer).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.AddTrojanServerCmd, v => v.menuAddTrojanServer).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddHysteria2ServerCmd, v => v.menuAddHysteria2Server).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddTuicServerCmd, v => v.menuAddTuicServer).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddWireguardServerCmd, v => v.menuAddWireguardServer).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.AddCustomServerCmd, v => v.menuAddCustomServer).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.AddServerViaClipboardCmd, v => v.menuAddServerViaClipboard).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.AddServerViaScanCmd, v => v.menuAddServerViaScan).DisposeWith(disposables);
@@ -138,11 +141,11 @@ namespace v2rayN.Views
 
                 //checkupdate
                 this.BindCommand(ViewModel, vm => vm.CheckUpdateNCmd, v => v.menuCheckUpdateN).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateV2flyCoreCmd, v => v.menuCheckUpdateV2flyCore).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateSagerNetCoreCmd, v => v.menuCheckUpdateSagerNetCore).DisposeWith(disposables);
+                //this.BindCommand(ViewModel, vm => vm.CheckUpdateV2flyCoreCmd, v => v.menuCheckUpdateV2flyCore).DisposeWith(disposables);
+                //this.BindCommand(ViewModel, vm => vm.CheckUpdateSagerNetCoreCmd, v => v.menuCheckUpdateSagerNetCore).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.CheckUpdateXrayCoreCmd, v => v.menuCheckUpdateXrayCore).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashCoreCmd, v => v.menuCheckUpdateClashCore).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashMetaCoreCmd, v => v.menuCheckUpdateClashMetaCore).DisposeWith(disposables);
+                //this.BindCommand(ViewModel, vm => vm.CheckUpdateClashCoreCmd, v => v.menuCheckUpdateClashCore).DisposeWith(disposables);
+                //this.BindCommand(ViewModel, vm => vm.CheckUpdateClashMetaCoreCmd, v => v.menuCheckUpdateClashMetaCore).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.CheckUpdateSingBoxCoreCmd, v => v.menuCheckUpdateSingBoxCore).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.CheckUpdateGeoCmd, v => v.menuCheckUpdateGeo).DisposeWith(disposables);
 
@@ -210,8 +213,6 @@ namespace v2rayN.Views
             var IsAdministrator = Utils.IsAdministrator();
             this.Title = $"{Utils.GetVersion()} - {(IsAdministrator ? ResUI.RunAsAdmin : ResUI.NotRunAsAdmin)}";
 
-            spEnableTun.Visibility = IsAdministrator ? Visibility.Visible : Visibility.Collapsed;
-
             //if (_config.uiItem.autoHideStartup)
             //{
             //    WindowState = WindowState.Minimized;
@@ -274,7 +275,7 @@ namespace v2rayN.Views
 
         private void Current_SessionEnding(object sender, SessionEndingCancelEventArgs e)
         {
-            Utils.SaveLog("Current_SessionEnding");
+            Logging.SaveLog("Current_SessionEnding");
             StorageUI();
             ViewModel?.MyAppExit(true);
         }
@@ -322,33 +323,35 @@ namespace v2rayN.Views
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
-                if (e.Key == Key.V)
+                switch (e.Key)
                 {
-                    ViewModel?.AddServerViaClipboard();
-                }
-                else if (e.Key == Key.P)
-                {
-                    ViewModel?.ServerSpeedtest(ESpeedActionType.Ping);
-                }
-                else if (e.Key == Key.O)
-                {
-                    ViewModel?.ServerSpeedtest(ESpeedActionType.Tcping);
-                }
-                else if (e.Key == Key.R)
-                {
-                    ViewModel?.ServerSpeedtest(ESpeedActionType.Realping);
-                }
-                else if (e.Key == Key.S)
-                {
-                    _ = ViewModel?.ScanScreenTaskAsync();
-                }
-                else if (e.Key == Key.T)
-                {
-                    ViewModel?.ServerSpeedtest(ESpeedActionType.Speedtest);
-                }
-                else if (e.Key == Key.E)
-                {
-                    ViewModel?.ServerSpeedtest(ESpeedActionType.Mixedtest);
+                    case Key.V:
+                        ViewModel?.AddServerViaClipboard();
+                        break;
+
+                    case Key.P:
+                        ViewModel?.ServerSpeedtest(ESpeedActionType.Ping);
+                        break;
+
+                    case Key.O:
+                        ViewModel?.ServerSpeedtest(ESpeedActionType.Tcping);
+                        break;
+
+                    case Key.R:
+                        ViewModel?.ServerSpeedtest(ESpeedActionType.Realping);
+                        break;
+
+                    case Key.S:
+                        _ = ViewModel?.ScanScreenTaskAsync();
+                        break;
+
+                    case Key.T:
+                        ViewModel?.ServerSpeedtest(ESpeedActionType.Speedtest);
+                        break;
+
+                    case Key.E:
+                        ViewModel?.ServerSpeedtest(ESpeedActionType.Mixedtest);
+                        break;
                 }
             }
             else
@@ -478,7 +481,7 @@ namespace v2rayN.Views
             for (int i = 0; i < lvColumnItem.Count; i++)
             {
                 var item = lvColumnItem[i];
-                for (int k = 1; k < lstProfiles.Columns.Count; k++)
+                for (int k = 0; k < lstProfiles.Columns.Count; k++)
                 {
                     var item2 = (MyDGTextColumn)lstProfiles.Columns[k];
                     if (item2.ExName == item.Name)
@@ -498,10 +501,17 @@ namespace v2rayN.Views
 
             if (!_config.guiItem.enableStatistics)
             {
-                colTodayUp.Visibility = Visibility.Hidden;
-                colTodayDown.Visibility = Visibility.Hidden;
-                colTotalUp.Visibility = Visibility.Hidden;
+                colTodayUp.Visibility =
+                colTodayDown.Visibility =
+                colTotalUp.Visibility =
                 colTotalDown.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                colTodayUp.Visibility =
+                colTodayDown.Visibility =
+                colTotalUp.Visibility =
+                colTotalDown.Visibility = Visibility.Visible;
             }
         }
 
@@ -530,12 +540,12 @@ namespace v2rayN.Views
         private void AddHelpMenuItem()
         {
             var coreInfos = LazyConfig.Instance.GetCoreInfos();
-            foreach (var it in coreInfos)
+            foreach (var it in coreInfos
+                .Where(t => t.coreType != ECoreType.v2fly
+                            && t.coreType != ECoreType.clash
+                            && t.coreType != ECoreType.clash_meta
+                            && t.coreType != ECoreType.hysteria))
             {
-                if (it.coreType == ECoreType.v2fly)
-                {
-                    continue;
-                }
                 var item = new MenuItem()
                 {
                     Tag = it.coreUrl.Replace(@"/releases", ""),

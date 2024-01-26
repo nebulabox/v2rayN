@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using ReactiveUI;
+﻿using ReactiveUI;
 using System.Globalization;
 using System.IO;
 using System.Reactive.Disposables;
@@ -38,15 +37,15 @@ namespace v2rayN.Views
             {
                 cmbsystemProxyAdvancedProtocol.Items.Add(it);
             });
-            Global.LogLevel.ForEach(it =>
+            Global.LogLevels.ForEach(it =>
             {
                 cmbloglevel.Items.Add(it);
             });
-            Global.fingerprints.ForEach(it =>
+            Global.Fingerprints.ForEach(it =>
             {
                 cmbdefFingerprint.Items.Add(it);
             });
-            Global.userAgent.ForEach(it =>
+            Global.UserAgent.ForEach(it =>
             {
                 cmbdefUserAgent.Items.Add(it);
             });
@@ -63,7 +62,7 @@ namespace v2rayN.Views
             {
                 cmbStack.Items.Add(it);
             });
-            Global.coreTypes.ForEach(it =>
+            Global.CoreTypes.ForEach(it =>
             {
                 cmbCoreType1.Items.Add(it);
                 cmbCoreType2.Items.Add(it);
@@ -89,7 +88,12 @@ namespace v2rayN.Views
             //fill fonts
             try
             {
-                var files = Directory.GetFiles(Utils.GetFontsPath(), "*.ttf");
+                string[] searchPatterns = { "*.ttf", "*.ttc" };
+                var files = new List<string>();
+                foreach (var pattern in searchPatterns)
+                {
+                    files.AddRange(Directory.GetFiles(Utils.GetFontsPath(), pattern));
+                }
                 var culture = _config.uiItem.currentLanguage == Global.Languages[0] ? "zh-cn" : "en-us";
                 var culture2 = "en-us";
                 foreach (var ttf in files)
@@ -123,7 +127,7 @@ namespace v2rayN.Views
             }
             catch (Exception ex)
             {
-                Utils.SaveLog("fill fonts error", ex);
+                Logging.SaveLog("fill fonts error", ex);
             }
             cmbcurrentFontFamily.Items.Add(string.Empty);
 
@@ -146,6 +150,8 @@ namespace v2rayN.Views
                 this.Bind(ViewModel, vm => vm.defFingerprint, v => v.cmbdefFingerprint.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.defUserAgent, v => v.cmbdefUserAgent.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.mux4SboxProtocol, v => v.cmbmux4SboxProtocol.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.hyUpMbps, v => v.txtUpMbps.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.hyDownMbps, v => v.txtDownMbps.Text).DisposeWith(disposables);
 
                 //this.Bind(ViewModel, vm => vm.Kcpmtu, v => v.txtKcpmtu.Text).DisposeWith(disposables);
                 //this.Bind(ViewModel, vm => vm.Kcptti, v => v.txtKcptti.Text).DisposeWith(disposables);
@@ -179,6 +185,8 @@ namespace v2rayN.Views
                 this.Bind(ViewModel, vm => vm.TunStrictRoute, v => v.togStrictRoute.IsChecked).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.TunStack, v => v.cmbStack.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.TunMtu, v => v.cmbMtu.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.TunEnableExInbound, v => v.togEnableExInbound.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.TunEnableIPv6Address, v => v.togEnableIPv6Address.IsChecked).DisposeWith(disposables);
 
                 this.Bind(ViewModel, vm => vm.CoreType1, v => v.cmbCoreType1.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.CoreType2, v => v.cmbCoreType2.Text).DisposeWith(disposables);
@@ -189,20 +197,6 @@ namespace v2rayN.Views
 
                 this.BindCommand(ViewModel, vm => vm.SaveCmd, v => v.btnSave).DisposeWith(disposables);
             });
-        }
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void btnBrowse_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            var openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.Filter = "tunConfig|*.json|All|*.*";
-            openFileDialog1.ShowDialog();
-
-            // txtCustomTemplate.Text = openFileDialog1.FileName;
         }
     }
 }

@@ -42,7 +42,7 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return Properties.Resources.NotifyIcon1;
             }
         }
@@ -77,7 +77,7 @@ namespace v2rayN.Handler
                     return null;
                 }
 
-                var item = ConfigHandler.GetDefaultRouting(ref config);
+                var item = ConfigHandler.GetDefaultRouting(config);
                 if (item == null || Utils.IsNullOrEmpty(item.customIcon) || !File.Exists(item.customIcon))
                 {
                     return null;
@@ -112,7 +112,7 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return null;
             }
         }
@@ -163,7 +163,7 @@ namespace v2rayN.Handler
         private async Task UpdateTaskRunSubscription(Config config, Action<bool, string> update)
         {
             await Task.Delay(60000);
-            Utils.SaveLog("UpdateTaskRunSubscription");
+            Logging.SaveLog("UpdateTaskRunSubscription");
 
             var updateHandle = new UpdateHandle();
             while (true)
@@ -180,10 +180,10 @@ namespace v2rayN.Handler
                     {
                         update(success, msg);
                         if (success)
-                            Utils.SaveLog("subscription" + msg);
+                            Logging.SaveLog("subscription" + msg);
                     });
                     item.updateTime = updateTime;
-                    ConfigHandler.AddSubItem(ref config, item);
+                    ConfigHandler.AddSubItem(config, item);
 
                     await Task.Delay(5000);
                 }
@@ -196,7 +196,7 @@ namespace v2rayN.Handler
             var autoUpdateGeoTime = DateTime.Now;
 
             await Task.Delay(1000 * 120);
-            Utils.SaveLog("UpdateTaskRunGeo");
+            Logging.SaveLog("UpdateTaskRunGeo");
 
             var updateHandle = new UpdateHandle();
             while (true)

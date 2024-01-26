@@ -1,8 +1,6 @@
 ﻿using Microsoft.Win32;
 using Microsoft.Win32.TaskScheduler;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NLog;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -12,18 +10,14 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using v2rayN.Base;
-using v2rayN.Mode;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
@@ -54,7 +48,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             return result;
         }
@@ -72,109 +66,9 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             return null;
-        }
-
-        /// <summary>
-        /// 反序列化成对象
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="strJson"></param>
-        /// <returns></returns>
-        public static T? FromJson<T>(string? strJson)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(strJson))
-                {
-                    return default;
-                }
-                return JsonConvert.DeserializeObject<T>(strJson);
-            }
-            catch
-            {
-                return default;
-            }
-        }
-
-        /// <summary>
-        /// 序列化成Json
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static string ToJson(object? obj, bool indented = true)
-        {
-            string result = string.Empty;
-            try
-            {
-                if (obj == null)
-                {
-                    return result;
-                }
-                if (indented)
-                {
-                    result = JsonConvert.SerializeObject(obj,
-                                           Formatting.Indented,
-                                           new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                }
-                else
-                {
-                    result = JsonConvert.SerializeObject(obj, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                }
-            }
-            catch (Exception ex)
-            {
-                SaveLog(ex.Message, ex);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 保存成json文件
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static int ToJsonFile(object? obj, string filePath, bool nullValue = true)
-        {
-            int result;
-            try
-            {
-                using StreamWriter file = File.CreateText(filePath);
-                JsonSerializer serializer;
-                if (nullValue)
-                {
-                    serializer = new JsonSerializer() { Formatting = Formatting.Indented };
-                }
-                else
-                {
-                    serializer = new JsonSerializer() { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
-                }
-
-                serializer.Serialize(file, obj);
-                result = 0;
-            }
-            catch (Exception ex)
-            {
-                SaveLog(ex.Message, ex);
-                result = -1;
-            }
-            return result;
-        }
-
-        public static JObject? ParseJson(string strJson)
-        {
-            try
-            {
-                return JObject.Parse(strJson);
-            }
-            catch (Exception ex)
-            {
-                //SaveLog(ex.Message, ex);
-                return null;
-            }
         }
 
         #endregion 资源Json操作
@@ -205,7 +99,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return string.Empty;
             }
         }
@@ -224,7 +118,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return new List<string>();
             }
         }
@@ -245,7 +139,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return new List<string>();
             }
         }
@@ -264,7 +158,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog("Base64Encode", ex);
+                Logging.SaveLog("Base64Encode", ex);
                 return string.Empty;
             }
         }
@@ -278,7 +172,7 @@ namespace v2rayN
         {
             try
             {
-                plainText = plainText.TrimEx()
+                plainText = plainText.Trim()
                   .Replace(Environment.NewLine, "")
                   .Replace("\n", "")
                   .Replace("\r", "")
@@ -296,7 +190,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog("Base64Decode", ex);
+                Logging.SaveLog("Base64Decode", ex);
                 return string.Empty;
             }
         }
@@ -306,13 +200,13 @@ namespace v2rayN
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static int ToInt(object obj)
+        public static int ToInt(object? obj)
         {
             try
             {
-                return Convert.ToInt32(obj);
+                return Convert.ToInt32(obj ?? string.Empty);
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //SaveLog(ex.Message, ex);
                 return 0;
@@ -325,7 +219,7 @@ namespace v2rayN
             {
                 return Convert.ToBoolean(obj);
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //SaveLog(ex.Message, ex);
                 return false;
@@ -338,7 +232,7 @@ namespace v2rayN
             {
                 return obj?.ToString() ?? string.Empty;
             }
-            catch (Exception ex)
+            catch// (Exception ex)
             {
                 //SaveLog(ex.Message, ex);
                 return string.Empty;
@@ -408,7 +302,33 @@ namespace v2rayN
 
         public static string UrlDecode(string url)
         {
-            return HttpUtility.UrlDecode(url);
+            return Uri.UnescapeDataString(url);
+            //return HttpUtility.UrlDecode(url);
+        }
+
+        public static NameValueCollection ParseQueryString(string query)
+        {
+            var result = new NameValueCollection(StringComparer.OrdinalIgnoreCase);
+            if (IsNullOrEmpty(query))
+            {
+                return result;
+            }
+
+            var parts = query[1..].Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var part in parts)
+            {
+                var keyValue = part.Split(['=']);
+                if (keyValue.Length != 2)
+                {
+                    continue;
+                }
+                var key = Uri.UnescapeDataString(keyValue[0]);
+                var val = Uri.UnescapeDataString(keyValue[1]);
+
+                result.Add(key, val);
+            }
+
+            return result;
         }
 
         public static string GetMD5(string str)
@@ -493,7 +413,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return false;
             }
         }
@@ -599,14 +519,14 @@ namespace v2rayN
         /// </summary>
         /// <param name="run"></param>
         /// <returns></returns>
-        public static void SetAutoRun(bool run)
+        public static void SetAutoRun(string AutoRunRegPath, string AutoRunName, bool run)
         {
             try
             {
-                var autoRunName = $"{Global.AutoRunName}_{GetMD5(StartupPath())}";
+                var autoRunName = $"{AutoRunName}_{GetMD5(StartupPath())}";
 
                 //delete first
-                RegWriteValue(Global.AutoRunRegPath, autoRunName, "");
+                RegWriteValue(AutoRunRegPath, autoRunName, "");
                 if (IsAdministrator())
                 {
                     AutoStart(autoRunName, "", "");
@@ -621,42 +541,14 @@ namespace v2rayN
                     }
                     else
                     {
-                        RegWriteValue(Global.AutoRunRegPath, autoRunName, exePath);
+                        RegWriteValue(AutoRunRegPath, autoRunName, exePath);
                     }
                 }
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
-        }
-
-        /// <summary>
-        /// 是否已经设置开机自动启动
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsAutoRun()
-        {
-            try
-            {
-                //clear
-                if (!RegReadValue(Global.AutoRunRegPath, Global.AutoRunName, "").IsNullOrEmpty())
-                {
-                    RegWriteValue(Global.AutoRunRegPath, Global.AutoRunName, "");
-                }
-
-                string value = RegReadValue(Global.AutoRunRegPath, Global.AutoRunName, "");
-                string exePath = GetExePath();
-                if (value == exePath || value == $"\"{exePath}\"")
-                {
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                SaveLog(ex.Message, ex);
-            }
-            return false;
         }
 
         /// <summary>
@@ -679,7 +571,7 @@ namespace v2rayN
         /// <returns></returns>
         public static string GetExePath()
         {
-            return Environment.ProcessPath;
+            return Environment.ProcessPath ?? string.Empty;
         }
 
         public static string StartupPath()
@@ -705,7 +597,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             finally
             {
@@ -731,7 +623,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             finally
             {
@@ -860,7 +752,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             return inUse;
         }
@@ -881,39 +773,20 @@ namespace v2rayN
                 if (blFull)
                 {
                     return string.Format("v2rayN - V{0} - {1}",
-                            FileVersionInfo.GetVersionInfo(location).FileVersion.ToString(),
+                            FileVersionInfo.GetVersionInfo(location).FileVersion?.ToString(),
                             File.GetLastWriteTime(location).ToString("yyyy/MM/dd"));
                 }
                 else
                 {
                     return string.Format("v2rayN/{0}",
-                        FileVersionInfo.GetVersionInfo(location).FileVersion.ToString());
+                        FileVersionInfo.GetVersionInfo(location).FileVersion?.ToString());
                 }
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return string.Empty;
             }
-        }
-
-        /// <summary>
-        /// 深度拷贝
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static T DeepCopy<T>(T obj)
-        {
-            object retval;
-            MemoryStream ms = new MemoryStream();
-            BinaryFormatter bf = new BinaryFormatter();
-            //序列化成流
-            bf.Serialize(ms, obj);
-            ms.Seek(0, SeekOrigin.Begin);
-            //反序列化成对象
-            retval = bf.Deserialize(ms);
-            return (T)retval;
         }
 
         /// <summary>
@@ -934,7 +807,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             return strData;
         }
@@ -973,7 +846,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             return string.Empty;
         }
@@ -993,7 +866,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return false;
             }
         }
@@ -1033,7 +906,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
         }
 
@@ -1112,7 +985,7 @@ namespace v2rayN
             }
         }
 
-        public static string GetBinPath(string filename, ECoreType? coreType = null)
+        public static string GetBinPath(string filename, string? coreType = null)
         {
             string _tempPath = Path.Combine(StartupPath(), "bin");
             if (!Directory.Exists(_tempPath))
@@ -1173,33 +1046,6 @@ namespace v2rayN
 
         #endregion TempPath
 
-        #region Log
-
-        public static void SaveLog(string strContent)
-        {
-            if (LogManager.IsLoggingEnabled())
-            {
-                var logger = LogManager.GetLogger("Log1");
-                logger.Info(strContent);
-            }
-        }
-
-        public static void SaveLog(string strTitle, Exception ex)
-        {
-            if (LogManager.IsLoggingEnabled())
-            {
-                var logger = LogManager.GetLogger("Log2");
-                logger.Debug($"{strTitle},{ex.Message}");
-                logger.Debug(ex.StackTrace);
-                if (ex?.InnerException != null)
-                {
-                    logger.Error(ex.InnerException);
-                }
-            }
-        }
-
-        #endregion Log
-
         #region scan screen
 
         public static string ScanScreen(float dpiX, float dpiY)
@@ -1245,7 +1091,7 @@ namespace v2rayN
             }
             catch (Exception ex)
             {
-                SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             return string.Empty;
         }

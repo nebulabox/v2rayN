@@ -103,11 +103,11 @@ namespace v2rayN.Handler
                 {
                     try
                     {
-                        Task.Run(() => updateFun(it));
+                        _ = Task.Run(() => updateFun(it));
                     }
                     catch (Exception ex)
                     {
-                        Utils.SaveLog(ex.Message, ex);
+                        Logging.SaveLog(ex.Message, ex);
                     }
                 }
 
@@ -115,7 +115,7 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
         }
 
@@ -150,7 +150,7 @@ namespace v2rayN.Handler
             {
                 string msg = string.Empty;
 
-                pid = _coreHandler.LoadCoreConfigString(_selecteds);
+                pid = _coreHandler.LoadCoreConfigSpeedtest(_selecteds);
                 if (pid < 0)
                 {
                     UpdateFunc("", ResUI.FailedToRunCore);
@@ -184,7 +184,7 @@ namespace v2rayN.Handler
                         }
                         catch (Exception ex)
                         {
-                            Utils.SaveLog(ex.Message, ex);
+                            Logging.SaveLog(ex.Message, ex);
                         }
                     }));
                 }
@@ -192,11 +192,14 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             finally
             {
-                if (pid > 0) _coreHandler.CoreStopPid(pid);
+                if (pid > 0)
+                {
+                    _coreHandler.CoreStopPid(pid);
+                }
                 ProfileExHandler.Instance.SaveTo();
             }
 
@@ -211,7 +214,7 @@ namespace v2rayN.Handler
             //    _selecteds = _selecteds.OrderBy(t => t.delay).ToList();
             //}
 
-            pid = _coreHandler.LoadCoreConfigString(_selecteds);
+            pid = _coreHandler.LoadCoreConfigSpeedtest(_selecteds);
             if (pid < 0)
             {
                 UpdateFunc("", ResUI.FailedToRunCore);
@@ -268,7 +271,7 @@ namespace v2rayN.Handler
         private async Task RunSpeedTestMulti()
         {
             int pid = -1;
-            pid = _coreHandler.LoadCoreConfigString(_selecteds);
+            pid = _coreHandler.LoadCoreConfigSpeedtest(_selecteds);
             if (pid < 0)
             {
                 UpdateFunc("", ResUI.FailedToRunCore);
@@ -346,7 +349,7 @@ namespace v2rayN.Handler
 
             try
             {
-                if (!IPAddress.TryParse(url, out IPAddress ipAddress))
+                if (!IPAddress.TryParse(url, out IPAddress? ipAddress))
                 {
                     IPHostEntry ipHostInfo = System.Net.Dns.GetHostEntry(url);
                     ipAddress = ipHostInfo.AddressList[0];
@@ -368,7 +371,7 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
             }
             return responseTime;
         }
@@ -404,7 +407,7 @@ namespace v2rayN.Handler
             }
             catch (Exception ex)
             {
-                Utils.SaveLog(ex.Message, ex);
+                Logging.SaveLog(ex.Message, ex);
                 return -1;
             }
             return roundtripTime;
