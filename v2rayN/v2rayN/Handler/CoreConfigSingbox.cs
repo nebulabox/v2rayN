@@ -189,6 +189,20 @@ namespace v2rayN.Handler
                     }
 
                     singboxConfig.inbounds.Add(tunInbound);
+
+                    // mixed
+                    tunInbound = JsonUtils.Deserialize<Inbound4Sbox>(Utils.GetEmbedText(Global.TunSingboxInboundMixFileName)) ?? new Inbound4Sbox { };
+                    tunInbound.mtu = _config.tunModeItem.mtu;
+                    tunInbound.strict_route = _config.tunModeItem.strictRoute;
+                    tunInbound.stack = _config.tunModeItem.stack;
+                    tunInbound.sniff = _config.inbound[0].sniffingEnabled;
+                    tunInbound.sniff_override_destination = _config.inbound[0].routeOnly ? false : _config.inbound[0].sniffingEnabled;
+                    if (_config.tunModeItem.enableIPv6Address == false)
+                    {
+                        tunInbound.inet6_address = null;
+                    }
+
+                    singboxConfig.inbounds.Add(tunInbound);
                 }
             }
             catch (Exception ex)

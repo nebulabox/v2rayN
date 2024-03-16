@@ -1,0 +1,7 @@
+{
+  "type": "mixed",
+  "tag": "in_mixed",
+  "listen": "0.0.0.0",
+  "listen_port": 51080,
+  "set_system_proxy": false
+}

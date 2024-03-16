@@ -28,7 +28,7 @@ namespace v2rayN
         public const string JuicityCoreUrl = "https://github.com/juicity/juicity/releases";
         public const string CustomRoutingListUrl = @"https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/";
 
-        public const string PromotionUrl = @"aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw=";
+        public const string PromotionUrl = @"";
         public const string ConfigFileName = "guiNConfig.json";
         public const string ConfigDB = "guiNDB.db";
         public const string CoreConfigFileName = "config.json";
@@ -44,6 +44,7 @@ namespace v2rayN
         public const string CustomRoutingFileName = "v2rayN.Sample.custom_routing_";
         public const string TunSingboxDNSFileName = "v2rayN.Sample.tun_singbox_dns";
         public const string TunSingboxInboundFileName = "v2rayN.Sample.tun_singbox_inbound";
+        public const string TunSingboxInboundMixFileName = "v2rayN.Sample.tun_singbox_inbound_mix";
         public const string TunSingboxRulesFileName = "v2rayN.Sample.tun_singbox_rules";
         public const string DNSV2rayNormalFileName = "v2rayN.Sample.dns_v2ray_normal";
         public const string DNSSingboxNormalFileName = "v2rayN.Sample.dns_singbox_normal";

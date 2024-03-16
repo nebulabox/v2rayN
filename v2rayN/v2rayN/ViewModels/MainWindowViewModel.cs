@@ -507,10 +507,10 @@ namespace v2rayN.ViewModels
             });
 
             //CheckUpdate
-            CheckUpdateNCmd = ReactiveCommand.Create(() =>
-            {
-                CheckUpdateN();
-            });
+            //CheckUpdateNCmd = ReactiveCommand.Create(() =>
+            //{
+            //    CheckUpdateN();
+            //});
             //CheckUpdateV2flyCoreCmd = ReactiveCommand.Create(() =>
             //{
             //    CheckUpdateCore(ECoreType.v2fly_v5);
@@ -519,10 +519,10 @@ namespace v2rayN.ViewModels
             //{
             //    CheckUpdateCore(ECoreType.SagerNet);
             //});
-            CheckUpdateXrayCoreCmd = ReactiveCommand.Create(() =>
-            {
-                CheckUpdateCore(ECoreType.Xray);
-            });
+            //CheckUpdateXrayCoreCmd = ReactiveCommand.Create(() =>
+            //{
+            //    CheckUpdateCore(ECoreType.Xray);
+            //});
             //CheckUpdateClashCoreCmd = ReactiveCommand.Create(() =>
             //{
             //    CheckUpdateCore(ECoreType.clash);
